@@ -323,14 +323,16 @@ function update(time, delta) {
   const domElement = document.getElementById("shakeHandImg");
   domElement.addEventListener("click", () => {
     isEmoteFlag = true;
-    // setTimeout(() => {
-    //   isEmoteFlag = false;
-    // }, "1000");
+    setTimeout(() => {
+      isEmoteFlag = false;
+    }, "1000");
   });
 
   // プレイヤー名をプレイヤー座標の上に表示する
-  playerName.x = phaserPlayerList[playerId].x;
-  playerName.y = phaserPlayerList[playerId].y;
+  playerName.setPosition(
+    phaserPlayerList[playerId].x,
+    phaserPlayerList[playerId].y - 20
+  );
   console.log("----------------------------------------");
   console.log("follower.x=", playerName.x);
   console.log("player.x=", phaserPlayerList[playerId].x);
