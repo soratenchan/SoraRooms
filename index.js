@@ -26,25 +26,29 @@ let webSocketPlayerList = {};
 let worldLayer;
 let spawnPoint;
 let showDebug = false;
+let follower;
+let playerName = localStorage.getItem("playerName");
+let anotherPlayerNameList = {};
+let isCreateNameFlag = true;
+let isEmoteFlag = false;
+let avatar = localStorage.getItem("avatar");
 
 function preload() {
   // 自分で作ったやつ
   // this.load.image("tiles", "/assets/testMap.png");
   // this.load.tilemapTiledJSON("map", "/assets/map.json");
-
   this.load.image("tiles", "/assets/tilesets/tuxmon-sample-32px-extruded.png");
   this.load.tilemapTiledJSON("map", "/assets/tilemaps/tuxemon-town.json");
-
-  // An atlas is a way to pack multiple images together into one texture. I'm using it to load all
-  // the player animations (walking left, walking right, etc.) in one image. For more info see:
-  //  https://labs.phaser.io/view.html?src=src/animation/texture%20atlas%20animation.js
-  // If you don't use an atlas, you can do the same thing with a spritesheet, see:
-  //  https://labs.phaser.io/view.html?src=src/animation/single%20sprite%20sheet.js
   this.load.atlas(
     "atlas",
     "/assets/atlas/atlas.png",
     "/assets/atlas/atlas.json"
   );
+  this.load.spritesheet("dude", "assets/dude.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.image("shakeHand", "/assets/shakehand.png");
 }
 
 function create() {
@@ -56,8 +60,6 @@ function create() {
   // const tileset = map.addTilesetImage("tilemap", "tiles");
   const tileset = map.addTilesetImage("tuxmon-sample-32px-extruded", "tiles");
 
-  // Parameters: layer name (or index) from Tiled, tileset, x, y
-
   // 自分で作ったやつ
   // const belowLayer = map.createLayer("ground", tileset, 0, 0);
   // worldLayer = map.createLayer("object", tileset, 0, 0);
@@ -66,15 +68,7 @@ function create() {
   const aboveLayer = map.createLayer("Above Player", tileset, 0, 0);
 
   worldLayer.setCollisionByProperty({ collides: true });
-
   aboveLayer.setDepth(10);
-
-  // By default, everything gets depth sorted on the screen in the order we created things. Here, we
-  // want the "Above Player" layer to sit on top of the player, so we explicitly give it a depth.
-  // Higher depths will sit on top of lower depth objects.
-
-  // Object layers in Tiled let you embed extra info into a map - like a spawn point or custom
-  // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
 
   // 自分で作ったやつ
   // spawnPoint = map.findObject("player", (obj) => obj.name === "spawnpoint");
@@ -89,11 +83,33 @@ function create() {
     spawnPoint
   );
 
-  // Create the player's walking animations from the texture atlas. These are stored in the global
-  // animation manager so any sprite can access them.
   const anims = this.anims;
+  // dudeのアニメーション作成
   anims.create({
-    key: "misa-left-walk",
+    key: "dude-left",
+    frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+  anims.create({
+    key: "dude-front",
+    frames: [{ key: "dude", frame: 4 }],
+    frameRate: 20,
+  });
+  anims.create({
+    key: "dude-back",
+    frames: [{ key: "dude", frame: 4 }],
+    frameRate: 20,
+  });
+  anims.create({
+    key: "dude-right",
+    frames: this.anims.generateFrameNumbers("dude", { start: 5, end: 8 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+  // misaのアニメーション作成
+  anims.create({
+    key: "misa-left",
     frames: anims.generateFrameNames("atlas", {
       prefix: "misa-left-walk.",
       start: 0,
@@ -104,7 +120,7 @@ function create() {
     repeat: -1,
   });
   anims.create({
-    key: "misa-right-walk",
+    key: "misa-right",
     frames: anims.generateFrameNames("atlas", {
       prefix: "misa-right-walk.",
       start: 0,
@@ -115,7 +131,7 @@ function create() {
     repeat: -1,
   });
   anims.create({
-    key: "misa-front-walk",
+    key: "misa-front",
     frames: anims.generateFrameNames("atlas", {
       prefix: "misa-front-walk.",
       start: 0,
@@ -126,7 +142,7 @@ function create() {
     repeat: -1,
   });
   anims.create({
-    key: "misa-back-walk",
+    key: "misa-back",
     frames: anims.generateFrameNames("atlas", {
       prefix: "misa-back-walk.",
       start: 0,
@@ -143,9 +159,7 @@ function create() {
 
   cursors = this.input.keyboard.createCursorKeys();
 
-  // Help text that has a "fixed" position on the screen
-
-  // Debug graphics
+  // 衝突する処理のデバッグ
   this.input.keyboard.once("keydown-D", (event) => {
     // Turn on physics debugging to show player's hitbox
     this.physics.world.createDebugGraphic();
@@ -158,10 +172,23 @@ function create() {
       faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Color of colliding face edges
     });
   });
+
+  // プレイヤーに追従するimageを設定
+  follower = this.add
+    .follower(phaserPlayerList[playerId], 0, 0, "shakeHand")
+    .setVisible(false);
+
+  // プレイヤー名をtext要素で定義
+  playerName = createPlayerName(
+    this.add,
+    phaserPlayerList[playerId],
+    localStorage.getItem("playerName")
+  );
+  // プレイヤー名を中央寄せする
+  playerName.setOrigin(0.5, 0.5);
 }
 
 function update(time, delta) {
-  console.log(phaserPlayerList);
   // 他のプレイヤーの生成処理;
   for (const webSocketPlayerId in webSocketPlayerList) {
     if (!phaserPlayerList.hasOwnProperty(webSocketPlayerId)) {
@@ -182,13 +209,14 @@ function update(time, delta) {
       continue;
     }
     if (!webSocketPlayerList.hasOwnProperty(phaserPlayerId)) {
+      anotherPlayerNameList[phaserPlayerId].destroy();
       phaserPlayerList[phaserPlayerId].disableBody(true, true);
       delete phaserPlayerList[phaserPlayerId];
     }
   }
 
   const speed = 175;
-  console.log(playerId);
+
   const prevVelocity = phaserPlayerList[playerId].body.velocity.clone();
 
   // Stop any previous movement from the last frame
@@ -201,13 +229,29 @@ function update(time, delta) {
   // 他プレイヤーの情報更新
   for (const webSocketPlayerId in webSocketPlayerList) {
     if (webSocketPlayerId != playerId) {
+      //初回に各playerNameを作成・listに追加、その後は作成したplayerNameの位置を調整
+      if (isCreateNameFlag) {
+        anotherPlayerNameList[webSocketPlayerId] = createPlayerName(
+          this.add,
+          webSocketPlayerList[webSocketPlayerId],
+          webSocketPlayerList[webSocketPlayerId].playerName
+        );
+        anotherPlayerNameList[webSocketPlayerId].setOrigin(0.5, 0.5);
+        isCreateNameFlag = false;
+      } else {
+        anotherPlayerNameList[webSocketPlayerId].setPosition(
+          webSocketPlayerList[webSocketPlayerId].x,
+          webSocketPlayerList[webSocketPlayerId].y - 10
+        );
+        // anotherPlayerName.destroy();
+      }
       phaserPlayerList[webSocketPlayerId].body.x =
         webSocketPlayerList[webSocketPlayerId].x;
       phaserPlayerList[webSocketPlayerId].body.y =
         webSocketPlayerList[webSocketPlayerId].y;
       if (webSocketPlayerList[webSocketPlayerId].isMove) {
         phaserPlayerList[webSocketPlayerId].anims.play(
-          `misa-${webSocketPlayerList[webSocketPlayerId].direction}-walk`,
+          `misa-${webSocketPlayerList[webSocketPlayerId].direction}`,
           true
         );
       } else {
@@ -239,11 +283,12 @@ function update(time, delta) {
 
   // Normalize and scale the velocity so that player can't move faster along a diagonal
   phaserPlayerList[playerId].body.velocity.normalize().scale(speed);
+  console.log("player.x=", phaserPlayerList[playerId].x);
 
   // プレイヤーが動いているか否かでアニメーション表示変える
   if (phaserPlayerList[playerId].body.isMove) {
     phaserPlayerList[playerId].anims.play(
-      `misa-${phaserPlayerList[playerId].body.direction}-walk`,
+      `${avatar}-${phaserPlayerList[playerId].body.direction}`,
       true
     );
   } else {
@@ -251,7 +296,9 @@ function update(time, delta) {
 
     // If we were moving, pick and idle frame to use
     if (prevVelocity.x < 0)
-      phaserPlayerList[playerId].setTexture("atlas", "misa-left");
+      avatar === "misa"
+        ? phaserPlayerList[playerId].setTexture("atlas", "misa-left")
+        : phaserPlayerList[playerId].anims.play("dude-front");
     else if (prevVelocity.x > 0)
       phaserPlayerList[playerId].setTexture("atlas", "misa-right");
     else if (prevVelocity.y < 0)
@@ -260,6 +307,34 @@ function update(time, delta) {
       phaserPlayerList[playerId].setTexture("atlas", "misa-front");
   }
 
+  //isEmoteFlagで追従しているエモート画像のon/off
+  follower.setScale(0.08);
+  if (isEmoteFlag) {
+    follower
+      .setPosition(
+        phaserPlayerList[playerId].x,
+        phaserPlayerList[playerId].y - 40
+      )
+      .setVisible(true);
+  } else {
+    follower.setVisible(false);
+  }
+  // ボタンをクリックしたらプレイヤーに追従している画像を１秒間表示
+  const domElement = document.getElementById("shakeHandImg");
+  domElement.addEventListener("click", () => {
+    isEmoteFlag = true;
+    // setTimeout(() => {
+    //   isEmoteFlag = false;
+    // }, "1000");
+  });
+
+  // プレイヤー名をプレイヤー座標の上に表示する
+  playerName.x = phaserPlayerList[playerId].x;
+  playerName.y = phaserPlayerList[playerId].y;
+  console.log("----------------------------------------");
+  console.log("follower.x=", playerName.x);
+  console.log("player.x=", phaserPlayerList[playerId].x);
+  console.log("----------------------------------------");
   // socket送信
   sendPlayerInfo(phaserPlayerList[playerId].body);
 }
@@ -272,6 +347,7 @@ const sendPlayerInfo = (playerBody) => {
     direction: playerBody.direction,
     isMove: playerBody.isMove,
     id: playerId,
+    playerName: localStorage.getItem("playerName"),
   };
   socket.emit("sendPlayerInfo", playerState);
 };
@@ -297,6 +373,30 @@ const createPlayer = (physicsAdd, worldLayer, spawnPoint) => {
   return player;
 };
 
+const playEmote = (follower, player, time, isEmote) => {
+  // 画像を表示する
+  // follower.setScale(0.08);
+  // follower.setPosition(player.x, player.y - 45).setVisible(true);
+  // 1秒後に画像を非表示にする
+  time.addEvent({
+    delay: 1000,
+    callback: () => {
+      follower.setVisible(false);
+      isEmote = false;
+    },
+    loop: false,
+  });
+};
+
+// phaser3上で動作するtext要素をプレイヤーの位置に作成
+const createPlayerName = (element, player, name) => {
+  let playerName = element.text(player.x, player.y, name, {
+    font: "15px",
+    fill: "#FFFFFF",
+    align: "center",
+  });
+  return playerName;
+};
 // ウェブソケット受信するたびにwebSocketPlayerListの他プレイヤー情報更新
 socket.on("receivePlayerInfo", (PlayerInfoList) => {
   webSocketPlayerList = PlayerInfoList;
