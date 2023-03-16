@@ -8,22 +8,52 @@ const socketIo = require("socket.io");
 const app = express();
 const server = http.Server(app);
 const multer = require("multer");
-const updir = path.dirname(__dirname).replace(/\\/g, "/") + "/tempMap"; // アプリケーションフォルダのサブディレクトリ "./tmp" をアップロード先にしている。
-const upload = multer({ dest: updir });
-app.use(bodyParser.urlencoded({ extended: true }));
+const updir = path.resolve(__dirname, "./tempMap"); // アプリケーションフォルダのサブディレクトリ "./tmp" をアップロード先にしている。
 
 // 初期化
 const io = socketIo(server);
 
 const PORT = 3000;
 
+const storage = multer.diskStorage({
+  destination(req, file, callback) {
+    callback(null, path.resolve(__dirname, "./tempMap"));
+  },
+  filename(req, file, callback) {
+    const uniqueSuffix = Math.random().toString(26).substring(4, 10);
+    callback(null, `${Date.now()}-${uniqueSuffix}-${file.originalname}`);
+  },
+});
+
+// multerの設定
+const MAXFILES = 3;
+const namedOption = [
+  { name: "tileMapJson", maxCount: 1 },
+  { name: "tileSetPng", maxCount: MAXFILES },
+  { name: "thumbnail", maxCount: MAXFILES },
+];
+const upload = multer({
+  storage,
+  fileFilter(req, file, callback) {
+    // console.log(file.mimetype);
+    callback(null, true);
+    return;
+  },
+});
+
+let mapConfig = {};
+
 let serverWebSocketPlayerList = {};
+
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
+app.set("view engine", "ejs");
 app.get("/enter", (req, res) => {
-  res.sendFile(__dirname + "/enter.html");
+  const data = fs.readdirSync(__dirname + "/user-map");
+  res.render(__dirname + "/enter.ejs", { data: data });
 });
 app.get("/create", (req, res) => {
   res.sendFile(__dirname + "/createMap.html");
@@ -32,18 +62,55 @@ app.get("/index.js", (req, res) => {
   res.sendFile(__dirname + "/index.js");
 });
 app.use("/assets", express.static("assets"));
+app.use("/user-map", express.static("user-map"));
+app.use("/thumbnails", express.static("thumbnails"));
 
-app.post(
-  "/createMap",
-  upload.fields([{ name: "tileMapJson" }, { name: "tileSetPng" }]),
-  async (req, res) => {
-    // const content1 = fs.readFileSync(req.files["tileMapJson"][0].path, "utf-8");
-    // const content2 = fs.readFileSync(req.files["tileSetPng"][0].path, "utf-8");
-    // console.log(content1);
-    console.log(req.files);
-    res.json({ hoge: "hoge" });
+// createMapから送られてきたmapNameのvalueでフォルダを作成し、2つのファイルを格納
+app.post("/createMap", upload.fields(namedOption), (req, res) => {
+  const path1 = req.files["tileMapJson"][0].path.replace(/\\/g, "/");
+  fs.mkdirSync("user-map/" + req.body.mapName);
+  if (path1) {
+    const dest = "user-map/" + req.body.mapName + "/" + "tileMap.json";
+    fs.renameSync(path1, dest); // 長い一時ファイル名を元のファイル名にリネームする。
+    let jsonData = JSON.parse(fs.readFileSync(dest));
+    jsonData["tilesets"][0][
+      "image"
+    ] = `./user-map/${req.body.mapName}/tileSet.png`;
+    fs.writeFileSync(dest, JSON.stringify(jsonData));
+
+    res.send("");
+    // res.render("upload", { message: `${dest} にアップロードされました。` });
+  } else {
+    res.render("upload", { message: "エラー：アップロードできませんでした。" });
   }
-);
+  const n = req.files["tileSetPng"].length;
+  for (let i = 0; i < n; i++) {
+    let path2 = req.files["tileSetPng"][i].path.replace(/\\/g, "/");
+    let dest2 = "user-map/" + req.body.mapName + "/" + "tileSet.png";
+    fs.renameSync(path2, dest2);
+  }
+  const a = req.files["thumbnail"].length;
+  for (let i = 0; i < n; i++) {
+    let path3 = req.files["thumbnail"][i].path.replace(/\\/g, "/");
+    let dest3 = "thumbnails/" + req.body.mapName + ".png";
+    fs.renameSync(path3, dest3);
+  }
+
+  // マップの設定をjson化してからjsonファイルとしてフォルダに格納
+  mapConfig.canDisplayPlayerName = req.body.canDisplayPlayerName;
+  mapConfig.canUseEmote = req.body.canUseEmote;
+  mapConfig.canUseTextChat = req.body.canUseTextChat;
+  mapConfig.canUseVoiceChat = req.body.canUseVoiceChat;
+  const jsonMapConfig = JSON.stringify(mapConfig);
+  fs.writeFile(
+    `user-map/${req.body.mapName}/file.json`,
+    jsonMapConfig,
+    (err) => {
+      if (err) throw err;
+    }
+  );
+  fs.readdir(updir, (error, files) => {});
+});
 
 server.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
@@ -58,10 +125,15 @@ io.on("connection", (socket) => {
   });
   // 第一引数には受信したメッセージが入り、ログに出力する
   socket.on("sendPlayerInfo", (playerInfo) => {
+    // console.log(playerInfo.mapName);
     // console.log("playerInfo: ", playerInfo);
+    socket.join(playerInfo.mapName);
     serverWebSocketPlayerList[socket.id] = playerInfo;
     // console.log(serverWebSocketPlayerList);
-    io.emit("receivePlayerInfo", serverWebSocketPlayerList);
+    io.to(playerInfo.mapName).emit(
+      "receivePlayerInfo",
+      serverWebSocketPlayerList
+    );
   });
 
   // プレイヤーが切断したらserverWebSocketPlayerListから該当のプレイヤーを削除したのちにplayerIdを送信
@@ -70,3 +142,7 @@ io.on("connection", (socket) => {
     delete serverWebSocketPlayerList[socket.id];
   });
 });
+
+// console.log(data["tilesets"][0]["image"]);
+
+const editTileMapJsonFile = (file, tileSetFile) => {};

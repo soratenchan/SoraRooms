@@ -4,18 +4,73 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Document</title>
   </head>
   <body>
     <form action="/createMap" method="post" enctype="multipart/form-data">
-      <input type="text" name="mapName" />
-      <input id="tileMapJson" type="file" name="tileMapJson" />
-      <input id="tileSetPng" type="file" name="tileSetPng" />
-      <input type="checkbox" name="canDisplayPlayerName" />
-      <input type="checkbox" name="canUseEmote" />
-      <input type="checkbox" name="canUseTextChat" />
-      <input type="checkbox" name="canUseVoiceChat" />
-      <input type="submit" />
+      <div class="space-y-5 p-5">
+        <input type="text" name="mapName" />
+        <label
+          class="block mb-2 text-md font-medium text-gray-900"
+          for="file_input"
+          >tileMapJson</label
+        >
+        <input
+          class="block w-72 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none"
+          id="tileMapJson"
+          type="file"
+          name="tileMapJson"
+        />
+        <label
+          class="block mb-2 text-md font-medium text-gray-900"
+          for="file_input"
+          >tileSetPng</label
+        >
+        <input
+          class="block w-72 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none"
+          id="tileSetPng"
+          type="file"
+          name="tileSetPng"
+        />
+        <label
+          class="block mb-2 text-md font-medium text-gray-900"
+          for="file_input"
+          >thumbnail</label
+        >
+        <input
+          class="block w-72 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none"
+          id="thumbnail"
+          type="file"
+          name="thumbnail"
+        />
+
+        <!-- <p>tileMapJson</p>
+      <input id="tileMapJson" type="file" name="tileMapJson" /> -->
+        <!-- <p>tileSetPng</p>
+      <input id="tileSetPng" type="file" name="tileSetPng" /> -->
+        <!-- <p>thumbnail</p>
+      <input id="thumbnail" type="file" name="thumbnail" /> -->
+        <div>
+          プレイヤー名表示
+          <input type="checkbox" name="canDisplayPlayerName" />
+        </div>
+        <div>
+          エモート機能
+          <input type="checkbox" name="canUseEmote" />
+        </div>
+        <div>
+          テキストチャット
+          <input type="checkbox" name="canUseTextChat" />
+        </div>
+        <div>
+          ボイスチャット
+          <input type="checkbox" name="canUseVoiceChat" />
+        </div>
+        <div>
+          <input type="submit" />
+        </div>
+      </div>
     </form>
   </body>
 </html>

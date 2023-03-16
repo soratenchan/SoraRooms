@@ -19,6 +19,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 const socket = io();
+const mapName = getParam("map");
 let playerId = Math.random().toString(32).substring(2);
 let cursors;
 let phaserPlayerList = {};
@@ -29,7 +30,6 @@ let showDebug = false;
 let follower;
 let playerName = localStorage.getItem("playerName");
 let anotherPlayerNameList = {};
-let isCreateNameFlag = true;
 let isEmoteFlag = false;
 let avatar = localStorage.getItem("avatar");
 
@@ -37,8 +37,12 @@ function preload() {
   // 自分で作ったやつ
   // this.load.image("tiles", "/assets/testMap.png");
   // this.load.tilemapTiledJSON("map", "/assets/map.json");
-  this.load.image("tiles", "/assets/tilesets/tuxmon-sample-32px-extruded.png");
-  this.load.tilemapTiledJSON("map", "/assets/tilemaps/tuxemon-town.json");
+
+  // this.load.image("tiles", "/assets/tilesets/tuxmon-sample-32px-extruded.png");
+  this.load.image("tiles", `/user-map/${mapName}/tileSet.png`);
+  // this.load.tilemapTiledJSON("map", "/assets/tilemaps/tuxemon-town.json");
+
+  this.load.tilemapTiledJSON("map", `/user-map/${mapName}/tileMap.json`);
   this.load.atlas(
     "atlas",
     "/assets/atlas/atlas.png",
@@ -57,23 +61,26 @@ function create() {
   const map = this.make.tilemap({ key: "map" });
 
   // 自分で作ったやつ
-  // const tileset = map.addTilesetImage("tilemap", "tiles");
-  const tileset = map.addTilesetImage("tuxmon-sample-32px-extruded", "tiles");
+  const tileset = map.addTilesetImage("tilemap", "tiles");
+
+  // const tileset = map.addTilesetImage("tuxmon-sample-32px-extruded", "tiles");
 
   // 自分で作ったやつ
-  // const belowLayer = map.createLayer("ground", tileset, 0, 0);
-  // worldLayer = map.createLayer("object", tileset, 0, 0);
-  const belowLayer = map.createLayer("Below Player", tileset, 0, 0);
-  worldLayer = map.createLayer("World", tileset, 0, 0);
+  const belowLayer = map.createLayer("ground", tileset, 0, 0);
+  worldLayer = map.createLayer("object", tileset, 0, 0);
+  // const belowLayer = map.createLayer("Below Player", tileset, 0, 0);
+  // worldLayer = map.createLayer("World", tileset, 0, 0);
   const aboveLayer = map.createLayer("Above Player", tileset, 0, 0);
+  if (aboveLayer) {
+    aboveLayer.setDepth(10);
+  }
 
   worldLayer.setCollisionByProperty({ collides: true });
-  aboveLayer.setDepth(10);
 
   // 自分で作ったやつ
-  // spawnPoint = map.findObject("player", (obj) => obj.name === "spawnpoint");
+  spawnPoint = map.findObject("player", (obj) => obj.name === "spawnpoint");
 
-  spawnPoint = map.findObject("Objects", (obj) => obj.name === "Spawn Point");
+  // spawnPoint = map.findObject("Objects", (obj) => obj.name === "Spawn Point");
 
   // Create a sprite with physics enabled via the physics system. The image used for the sprite has
   // a bit of whitespace, so I'm using setSize & setOffset to control the size of the player's body.
@@ -189,18 +196,25 @@ function create() {
 }
 
 function update(time, delta) {
+  // プレイヤー名をプレイヤー座標の上に表示する
+  playerName.setPosition(
+    phaserPlayerList[playerId].x,
+    phaserPlayerList[playerId].y - 20
+  );
   // 他のプレイヤーの生成処理;
   for (const webSocketPlayerId in webSocketPlayerList) {
     if (!phaserPlayerList.hasOwnProperty(webSocketPlayerId)) {
-      phaserPlayerList[webSocketPlayerId] = createPlayer(
-        this.physics.add,
-        worldLayer,
-        spawnPoint
-      );
-      this.physics.add.collider(
-        phaserPlayerList[playerId],
-        phaserPlayerList[webSocketPlayerId]
-      );
+      if (mapName == webSocketPlayerList[webSocketPlayerId].mapName) {
+        phaserPlayerList[webSocketPlayerId] = createPlayer(
+          this.physics.add,
+          worldLayer,
+          spawnPoint
+        );
+        this.physics.add.collider(
+          phaserPlayerList[playerId],
+          phaserPlayerList[webSocketPlayerId]
+        );
+      }
     }
   }
   // 他プレイヤーの削除処理
@@ -229,33 +243,36 @@ function update(time, delta) {
   // 他プレイヤーの情報更新
   for (const webSocketPlayerId in webSocketPlayerList) {
     if (webSocketPlayerId != playerId) {
-      //初回に各playerNameを作成・listに追加、その後は作成したplayerNameの位置を調整
-      if (isCreateNameFlag) {
-        anotherPlayerNameList[webSocketPlayerId] = createPlayerName(
-          this.add,
-          webSocketPlayerList[webSocketPlayerId],
-          webSocketPlayerList[webSocketPlayerId].playerName
-        );
-        anotherPlayerNameList[webSocketPlayerId].setOrigin(0.5, 0.5);
-        isCreateNameFlag = false;
-      } else {
-        anotherPlayerNameList[webSocketPlayerId].setPosition(
-          webSocketPlayerList[webSocketPlayerId].x,
-          webSocketPlayerList[webSocketPlayerId].y - 10
-        );
-        // anotherPlayerName.destroy();
-      }
-      phaserPlayerList[webSocketPlayerId].body.x =
-        webSocketPlayerList[webSocketPlayerId].x;
-      phaserPlayerList[webSocketPlayerId].body.y =
-        webSocketPlayerList[webSocketPlayerId].y;
-      if (webSocketPlayerList[webSocketPlayerId].isMove) {
-        phaserPlayerList[webSocketPlayerId].anims.play(
-          `misa-${webSocketPlayerList[webSocketPlayerId].direction}`,
-          true
-        );
-      } else {
-        phaserPlayerList[webSocketPlayerId].stop();
+      if (mapName == webSocketPlayerList[webSocketPlayerId].mapName) {
+        //初回に各playerNameを作成・listに追加、その後は作成したplayerNameの位置を調整
+        if (!anotherPlayerNameList[webSocketPlayerId]) {
+          anotherPlayerNameList[webSocketPlayerId] = createPlayerName(
+            this.add,
+            webSocketPlayerList[webSocketPlayerId],
+            webSocketPlayerList[webSocketPlayerId].playerName
+          );
+          anotherPlayerNameList[webSocketPlayerId].setOrigin(0.5, 0.5);
+        } else {
+          // console.log(webSocketPlayerId);
+          // console.log(anotherPlayerNameList);
+          anotherPlayerNameList[webSocketPlayerId].setPosition(
+            webSocketPlayerList[webSocketPlayerId].x,
+            webSocketPlayerList[webSocketPlayerId].y - 10
+          );
+          // anotherPlayerName.destroy();
+        }
+        phaserPlayerList[webSocketPlayerId].body.x =
+          webSocketPlayerList[webSocketPlayerId].x;
+        phaserPlayerList[webSocketPlayerId].body.y =
+          webSocketPlayerList[webSocketPlayerId].y;
+        if (webSocketPlayerList[webSocketPlayerId].isMove) {
+          phaserPlayerList[webSocketPlayerId].anims.play(
+            `misa-${webSocketPlayerList[webSocketPlayerId].direction}`,
+            true
+          );
+        } else {
+          phaserPlayerList[webSocketPlayerId].stop();
+        }
       }
     }
   }
@@ -283,7 +300,7 @@ function update(time, delta) {
 
   // Normalize and scale the velocity so that player can't move faster along a diagonal
   phaserPlayerList[playerId].body.velocity.normalize().scale(speed);
-  console.log("player.x=", phaserPlayerList[playerId].x);
+  // console.log("player.x=", phaserPlayerList[playerId].x);
 
   // プレイヤーが動いているか否かでアニメーション表示変える
   if (phaserPlayerList[playerId].body.isMove) {
@@ -328,15 +345,6 @@ function update(time, delta) {
     }, "1000");
   });
 
-  // プレイヤー名をプレイヤー座標の上に表示する
-  playerName.setPosition(
-    phaserPlayerList[playerId].x,
-    phaserPlayerList[playerId].y - 20
-  );
-  console.log("----------------------------------------");
-  console.log("follower.x=", playerName.x);
-  console.log("player.x=", phaserPlayerList[playerId].x);
-  console.log("----------------------------------------");
   // socket送信
   sendPlayerInfo(phaserPlayerList[playerId].body);
 }
@@ -350,6 +358,7 @@ const sendPlayerInfo = (playerBody) => {
     isMove: playerBody.isMove,
     id: playerId,
     playerName: localStorage.getItem("playerName"),
+    mapName: mapName,
   };
   socket.emit("sendPlayerInfo", playerState);
 };
@@ -399,6 +408,16 @@ const createPlayerName = (element, player, name) => {
   });
   return playerName;
 };
+
+function getParam(name, url) {
+  if (!url) url = window.location.href;
+  name = name.replace(/[\[\]]/g, "\\$&");
+  var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+    results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return "";
+  return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
 // ウェブソケット受信するたびにwebSocketPlayerListの他プレイヤー情報更新
 socket.on("receivePlayerInfo", (PlayerInfoList) => {
   webSocketPlayerList = PlayerInfoList;
