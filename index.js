@@ -1,7 +1,7 @@
 const config = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
+  width: "100%",
+  height: "100%",
   parent: "game-container",
   pixelArt: true,
   physics: {
@@ -15,6 +15,7 @@ const config = {
     create: create,
     update: update,
   },
+  backgroundColor: "#ffffff",
 };
 
 const game = new Phaser.Game(config);
@@ -409,6 +410,20 @@ const createPlayerName = (element, player, name) => {
   return playerName;
 };
 
+// socketで送られてきたチャットメッセージを追加
+const addMessageList = (message) => {
+  const chat = document.getElementById("chat");
+  const ul = document.getElementById("messageList");
+  const li = document.createElement("p");
+  const text = document.createTextNode(message.message);
+  const name = document.createTextNode(message.playerName.data.text + ":");
+  li.appendChild(name);
+  li.appendChild(text);
+  ul.appendChild(li);
+  // chat.scrollTo(0, ul.scrollHeight);
+};
+
+// queryからmapnameを取得
 function getParam(name, url) {
   if (!url) url = window.location.href;
   name = name.replace(/[\[\]]/g, "\\$&");
@@ -418,6 +433,37 @@ function getParam(name, url) {
   if (!results[2]) return "";
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
+
+// チャットボタン押した時にsocketでチャットを送信
+document.getElementById("sendButton").addEventListener("click", () => {
+  let inputMessage = document.getElementById("inputText").value;
+  if (inputMessage === "") {
+    return;
+  }
+  socket.emit("sendMessage", {
+    message: inputMessage,
+    mapName: mapName,
+    playerName: playerName,
+  });
+  document.getElementById("inputText").value = "";
+});
+
+const sendMessageByEnterKey = (code) => {
+  console.log(code);
+  //エンターキー押下なら
+  if (13 === code) {
+    let inputMessage = document.getElementById("inputText").value;
+    if (inputMessage === "") {
+      return;
+    }
+    socket.emit("sendMessage", {
+      message: inputMessage,
+      mapName: mapName,
+      playerName: playerName,
+    });
+    document.getElementById("inputText").value = "";
+  }
+};
 // ウェブソケット受信するたびにwebSocketPlayerListの他プレイヤー情報更新
 socket.on("receivePlayerInfo", (PlayerInfoList) => {
   webSocketPlayerList = PlayerInfoList;
@@ -431,10 +477,15 @@ socket.on("disconnectPlayer", (deletedPlayerId) => {
 
 // playerIdをsocketIdに置き換える処理
 socket.on("receiveSocketId", (socketId) => {
-  document.getElementById("idName").innerText = socketId;
+  // document.getElementById("idName").innerText = socketId;
   phaserPlayerList[socketId] = phaserPlayerList[playerId];
   webSocketPlayerList[socketId] = webSocketPlayerList[playerId];
   delete webSocketPlayerList[playerId];
   delete phaserPlayerList[playerId];
   playerId = socketId;
+});
+
+socket.on("receiveMessage", (message) => {
+  // 受信したメッセージをulタグに挿入
+  addMessageList(message);
 });

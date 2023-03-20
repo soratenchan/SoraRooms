@@ -4,8 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link href="/dist/rpgui.css" rel="stylesheet" type="text/css" />
+    <script src="/dist/rpgui.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://unpkg.com/nes.css@latest/css/nes.min.css"
+      rel="stylesheet"
+    />
+    <link href="/dist/rpgui.css" rel="stylesheet" type="text/css" />
+    <script
+      src="https://kit.fontawesome.com/3e8da217f3.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="/dist/rpgui.js"></script>
     <title>Phaser Template</title>
-
     <style>
       html,
       body,
@@ -15,8 +27,8 @@
       }
 
       #game-container {
-        min-width: 100vw;
-        min-height: 100vh;
+        min-width: 76vw;
+        min-height: 90vh;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -30,13 +42,78 @@
 
   <body>
     <span id="idName"></span>
-    <div id="game-container">
-      <span id="shakeHandImg" class=""
-        ><img width="30" src="./assets/shakehand.png"
-      /></span>
+    <div class="rpgui-content">
+      <div class="rpgui-container framed relative h-full">
+        <div class="flex flex-row pt-4">
+          <div id="shakeHandImg" class="">
+            <img width="30" src="./assets/shakehand.png" />
+          </div>
+          <div class="relative" id="game-container">
+            <div class="absolute top-0 right-0 w-1/6">
+              <video
+                style="transform: scale(-1, 1)"
+                id="js-local-stream"
+              ></video>
+              <div class="remote-streams" id="js-remote-streams"></div>
+            </div>
+          </div>
+          <div class="nes-container bg-white is-dark w-full p-0 flex flex-col">
+            <div class="flex flex-row">
+              <a class="nes-btn w-1/4">
+                <i class="fa-solid fa-comments fa-2x"></i></a
+              ><a id="mikeOn" class="nes-btn w-1/4">
+                <i class="fa-2x fa-solid fa-microphone-slash fa-fw"></i
+              ></a>
+              <a id="mikeOff" class="hidden nes-btn w-1/4">
+                <i class="fa-solid fa-microphone fa-2x fa-fw"></i>
+              </a>
+              <a id="offVideo" class="hidden nes-btn w-1/4">
+                <i class="fa-solid fa-video fa-2x"></i></a
+              ><a id="onVideo" class="nes-btn w-1/4">
+                <i class="fa-solid fa-video-slash fa-2x"></i></a
+              ><a class="nes-btn w-1/4" id="shareScreen">
+                <i class="fa-solid fa-desktop fa-2x"></i
+              ></a>
+            </div>
+            <a class="nes-btn is-success" id="js-join-trigger"
+              >join videoroom</a
+            >
+            <a class="nes-btn hidden is-warning" id="js-leave-trigger"
+              >leave videoroom</a
+            >
+            <!-- chatのdiv -->
+            <div class="flex flex-col justify-between w-full h-full">
+              <div class="p-4">
+                <div class="flex w-full">
+                  <ul class="space-y-4 text-gray-100" id="messageList" />
+                </div>
+              </div>
+              <div class="flex flex-row">
+                <div class="bg-gray-400 p-2">
+                  <input
+                    class="bg-white flex items-center h-12 w-full rounded px-3 text-sm"
+                    id="inputText"
+                    type="text"
+                    placeholder="コメントを入力…"
+                  />
+                </div>
+                <div
+                  class="p-4 flex items-center justify-center flex-grow bg-gray-300"
+                  id="sendButton"
+                >
+                  <i class="fa-2x fa-solid fa-paper-plane text-white"></i>
+                </div>
+              </div>
+            </div>
+            <!-- chatのdiv -->
+          </div>
+        </div>
+      </div>
     </div>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
     <script src="./index.js" type="module"></script>
+    <script src="//cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
+    <script src="./script.js"></script>
     <script src="/socket.io/socket.io.js"></script>
   </body>
 </html>

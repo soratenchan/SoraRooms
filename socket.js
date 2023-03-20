@@ -41,7 +41,12 @@ const upload = multer({
   },
 });
 
-let mapConfig = {};
+let mapConfig = {
+  canDisplayPlayerName: "no",
+  canUseEmote: "no",
+  canUseTextChat: "no",
+  canUseVoiceChat: "no",
+};
 
 let serverWebSocketPlayerList = {};
 
@@ -61,9 +66,13 @@ app.get("/create", (req, res) => {
 app.get("/index.js", (req, res) => {
   res.sendFile(__dirname + "/index.js");
 });
+app.get("/script.js", (req, res) => {
+  res.sendFile(__dirname + "/script.js");
+});
 app.use("/assets", express.static("assets"));
 app.use("/user-map", express.static("user-map"));
 app.use("/thumbnails", express.static("thumbnails"));
+app.use("/dist", express.static("dist"));
 
 // createMapから送られてきたmapNameのvalueでフォルダを作成し、2つのファイルを格納
 app.post("/createMap", upload.fields(namedOption), (req, res) => {
@@ -77,11 +86,10 @@ app.post("/createMap", upload.fields(namedOption), (req, res) => {
       "image"
     ] = `./user-map/${req.body.mapName}/tileSet.png`;
     fs.writeFileSync(dest, JSON.stringify(jsonData));
-
-    res.send("");
     // res.render("upload", { message: `${dest} にアップロードされました。` });
   } else {
     res.render("upload", { message: "エラー：アップロードできませんでした。" });
+    return;
   }
   const n = req.files["tileSetPng"].length;
   for (let i = 0; i < n; i++) {
@@ -110,6 +118,7 @@ app.post("/createMap", upload.fields(namedOption), (req, res) => {
     }
   );
   fs.readdir(updir, (error, files) => {});
+  res.redirect("/enter");
 });
 
 server.listen(PORT, () => {
@@ -134,6 +143,13 @@ io.on("connection", (socket) => {
       "receivePlayerInfo",
       serverWebSocketPlayerList
     );
+  });
+
+  // チャットで送られてきたメッセージをmapNameで作ったルームごとに送信
+  socket.on("sendMessage", (message) => {
+    socket.join(message.mapName);
+    // 'receiveMessage' というイベントを発火、受信したメッセージを全てのクライアントに対して送信する
+    io.to(message.mapName).emit("receiveMessage", message);
   });
 
   // プレイヤーが切断したらserverWebSocketPlayerListから該当のプレイヤーを削除したのちにplayerIdを送信

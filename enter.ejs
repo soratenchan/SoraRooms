@@ -6,71 +6,304 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://unpkg.com/nes.css@latest/css/nes.min.css"
+      rel="stylesheet"
+    />
+    <link href="/dist/rpgui.css" rel="stylesheet" type="text/css" />
+    <script src="/dist/rpgui.js"></script>
   </head>
-  <body class="bg-red-100">
-    <!-- <div class="flex space-x-10 items-center justify-center pt-20">
-      <a href="/">
-        <img
-          id="pokemon"
-          class="rounded-lg transform transition duration-500 hover:scale-105 w-[426px]"
-          src="./assets/mapImage.png"
-          alt=""
-        />
-      </a>
-      <img
-        class="rounded-lg transform transition duration-500 hover:scale-105 w-[426px]"
-        src="./assets/mapImage2.png"
-        alt=""
-      />
-    </div> -->
-
-    <div class="flex pt-5 px-5 justify-end">
-      <a href="/create">
-        <button
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          マップ作成
-        </button></a
-      >
-    </div>
-    <div class="flex items-center justify-center p-5 space-x-3">
-      <label class="block text-sm font-medium leading-6 text-gray-900"
-        >Name</label
-      >
-      <div class="mt-2">
-        <input
-          class="block w-64 rounded-md border-0 px-1 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          value="anonymous"
-          id="playerName"
-        />
+  <body class="" style="background-color: #222">
+    <div class="rpgui-content px-20 py-10" style="overflow-y: scroll">
+      <div class="relative">
+        <!-- rpgui goes here -->
+        <div class="rpgui-container framed relative h-full">
+          <section class="flex pt-3 px-5 justify-end">
+            <button
+              type="button"
+              class="nes-btn is-primary"
+              onclick="document.getElementById('dialog-dark-rounded').showModal();"
+            >
+              Create Map!
+            </button>
+            <dialog
+              class="nes-dialog is-dark is-rounded w-[620px]"
+              id="dialog-dark-rounded"
+            >
+              <h1 class="text-center title">
+                Create Map Form <i class="nes-jp-logo"></i>
+              </h1>
+              <form
+                action="/createMap"
+                method="post"
+                enctype="multipart/form-data"
+              >
+                <div class="flex flex-col pt-3 px-8">
+                  <div class="flex flex-col space-y-10">
+                    <div class="flex flex-col nes-field is-inline space-y-3">
+                      <label for="inline_field">Map Name</label>
+                      <input
+                        type="text"
+                        id="inline_field"
+                        class="nes-input is-warning"
+                        placeholder=""
+                        name="mapName"
+                        required
+                      />
+                    </div>
+                    <label class="nes-btn is-success">
+                      <span>Select your JsonFile</span>
+                      <input id="tileMapJson" type="file" name="tileMapJson" />
+                    </label>
+                    <label class="nes-btn is-success">
+                      <span>Select your PngFile</span>
+                      <input id="tileSetPng" type="file" name="tileSetPng" />
+                    </label>
+                    <label class="nes-btn is-success">
+                      <span>Select Thumbnail</span>
+                      <input id="thumbnail" type="file" name="thumbnail" />
+                    </label>
+                  </div>
+                  <div class="flex flex-row items-center justify-between">
+                    <p class="pt-6">Display player name?</p>
+                    <div class="flex flex-row space-x-5">
+                      <label class="text-center">
+                        <input
+                          type="radio"
+                          class="nes-radio is-dark"
+                          name="canDisplayPlayerName"
+                          value="yes"
+                        />
+                        <span>Yes</span>
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          class="nes-radio is-dark"
+                          name="canDisplayPlayerName"
+                          value="no"
+                        />
+                        <span class="flex justify-end">No</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="flex flex-row items-center justify-between">
+                    <p class="pt-6">Use emote feature?</p>
+                    <div class="flex flex-row space-x-5">
+                      <label class="text-center">
+                        <input
+                          type="radio"
+                          class="nes-radio is-dark"
+                          name="canUseEmote"
+                          value="yes"
+                        />
+                        <span>Yes</span>
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          class="nes-radio is-dark"
+                          name="canUseEmote"
+                          value="no"
+                        />
+                        <span class="flex justify-end">No</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="flex flex-row items-center justify-between">
+                    <p class="pt-6">Use text chat?</p>
+                    <div class="flex flex-row space-x-5">
+                      <label class="text-center">
+                        <input
+                          type="radio"
+                          class="nes-radio is-dark"
+                          name="canUseTextChat"
+                          value="yes"
+                        />
+                        <span>Yes</span>
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          class="nes-radio is-dark"
+                          name="canUseTextChat"
+                          value="no"
+                        />
+                        <span class="flex justify-end">No</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="flex flex-row items-center justify-between">
+                    <p class="pt-6">Use voice chat?</p>
+                    <div class="flex flex-row space-x-5">
+                      <label class="text-center">
+                        <input
+                          type="radio"
+                          class="nes-radio is-dark"
+                          name="canUseVoiceChat"
+                          value="yes"
+                        />
+                        <span>Yes</span>
+                      </label>
+                      <label class="">
+                        <input
+                          type="radio"
+                          class="nes-radio is-dark"
+                          name="canUseVoiceChat"
+                          value="no"
+                        />
+                        <span class="flex justify-end">No</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <menu
+                  class="pt-5 space-x-3 dialog-menu flex items-end justify-end"
+                >
+                  <button class="nes-btn">Cancel</button>
+                  <button type="submit" class="nes-btn is-primary">
+                    Confirm
+                  </button>
+                </menu>
+              </form>
+            </dialog>
+          </section>
+          <header>
+            <h1 style="font-size: 250%">SORA MAPS!</h1>
+            <hr class="golden" />
+            <h2 style="font-size: 175%">
+              CSS &amp; JavaScript lib to create old-school GUI in seconds!
+            </h2>
+          </header>
+          <div class="flex items-center justify-center p-3 space-x-3">
+            <!-- <label class="block text-sm font-medium leading-6 text-gray-900"
+              >Your Name</label
+            >
+            <div class="">
+              <input
+                class="block w-64 rounded-md border-0 px-1 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                value="anonymous"
+                id="playerName"
+              />
+            </div> -->
+            <div class="nes-field space-y-3 flex flex-col items-center">
+              <label class="nes-text is-success" for="name_field"
+                >Your name</label
+              >
+              <input
+                type="text"
+                value="anonymous"
+                id="playerName"
+                class="nes-input"
+                required
+              />
+            </div>
+          </div>
+          <div class="flex items-center justify-center space-x-3 pt-3">
+            <div class="nes-field flex flex-col items-center">
+              <label class="nes-text is-primary" for="name_field"
+                >Choose avatar</label
+              >
+              <div class="flex justify-center space-x-7">
+                <div class="flex flex-col items-center justify-center">
+                  <img
+                    id="misa"
+                    width="40"
+                    src="./assets/atlas/tuxemon-misa/misa-front.png"
+                  />
+                  <div class="flex pl-2.5 items-center justify-center">
+                    <input
+                      class="rpgui-checkbox pr-2"
+                      type="checkbox"
+                      id="checkbox1"
+                    /><label></label>
+                  </div>
+                </div>
+                <div class="flex flex-col items-center justify-center">
+                  <img
+                    id="misa"
+                    width="40"
+                    src="./assets/atlas/tuxemon-misa/misa-front.png"
+                  />
+                  <div class="flex pl-2.5 items-center justify-center">
+                    <input
+                      class="rpgui-checkbox pr-2"
+                      type="checkbox"
+                      id="checkbox2"
+                    /><label></label>
+                  </div>
+                </div>
+                <div class="flex flex-col items-center justify-center">
+                  <img
+                    id="misa"
+                    width="40"
+                    src="./assets/atlas/tuxemon-misa/misa-front.png"
+                  />
+                  <div class="flex pl-2.5 items-center justify-center">
+                    <input
+                      class="rpgui-checkbox pr-2"
+                      type="checkbox"
+                      id="checkbox3"
+                    /><label></label>
+                  </div>
+                </div>
+                <div class="flex flex-col items-center justify-center">
+                  <img
+                    id="misa"
+                    width="40"
+                    src="./assets/atlas/tuxemon-misa/misa-front.png"
+                  />
+                  <div class="flex pl-2.5 items-center justify-center">
+                    <input
+                      class="rpgui-checkbox pr-2"
+                      type="checkbox"
+                      id="checkbox4"
+                    /><label></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 justify-center gap-6 px-3 pt-5">
+            <% for(map of data) { %>
+            <!-- <div class="nes-container is-dark with-title space-y-2">
+              <p class="title"><%= map %></p>
+              <img
+                id="pokemon"
+                class="rounded-lg w-[426px] h-[340px] object-cover"
+                src="./thumbnails/<%= map %>.png"
+                alt=""
+              />
+              <a href="/?map=<%= map %>">
+                <button
+                  class="flex justify-center items-center w-full text-center rpgui-button golden"
+                  type="button"
+                >
+                  <p class="pt-2">Enter</p>
+                </button>
+              </a>
+            </div> -->
+            <div class="rpgui-container framed-golden relative space-y-2">
+              <p><%= map %></p>
+              <img
+                id="pokemon"
+                class="rounded-lg w-[426px] h-[340px] object-cover"
+                src="./thumbnails/<%= map %>.png"
+                alt=""
+              />
+              <a href="/?map=<%= map %>">
+                <button
+                  class="flex justify-center items-center w-full text-center rpgui-button golden"
+                  type="button"
+                >
+                  <p class="pt-2">Enter</p>
+                </button>
+              </a>
+            </div>
+            <% } %>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="flex justify-center space-x-5">
-      <img
-        id="misa"
-        width="32"
-        src="./assets/atlas/tuxemon-misa/misa-front.png"
-      />
-      <img
-        id="dude"
-        width="32"
-        src="./assets/atlas/tuxemon-misa/misa-front.png"
-      />
-    </div>
-    <div class="grid grid-cols-3">
-      <% for(map of data) { %>
-      <div class="flex flex-col col-span-1 items-center justify-center pt-10">
-        <p><%= map %></p>
-        <a href="/?map=<%= map %>">
-          <img
-            id="pokemon"
-            class="rounded-lg transform transition duration-500 hover:scale-105 w-[426px]"
-            src="./thumbnails/<%= map %>.png"
-            alt=""
-          />
-        </a>
-      </div>
-      <% } %>
     </div>
 
     <script>
@@ -81,11 +314,81 @@
       inputElement.addEventListener("change", () => {
         localStorage.setItem("playerName", inputElement.value);
       });
+      if (localStorage.getItem("playerName")) {
+        inputElement.value = localStorage.getItem("playerName");
+      } else {
+        inputElement.value = "anonymous";
+        localStorage.setItem("playerName", inputElement.value);
+      }
       misa.addEventListener("click", () => {
         localStorage.setItem("avatar", "misa");
       });
-      dude.addEventListener("click", () => {
-        localStorage.setItem("avatar", "dude");
+
+      // マップ作成モーダルのキャンセルボタンを押したときにモーダル閉じるように
+      const cancelButton = document.querySelector(".dialog-menu .nes-btn");
+      cancelButton.addEventListener("click", (event) => {
+        event.preventDefault(); // ボタンの既定の動作をキャンセルする
+        const form = document.querySelector("form");
+        form.reset(); // フォームの内容をリセットする
+        const dialog = document.querySelector("dialog");
+        dialog.close(); // ダイアログを閉じる
+      });
+
+      // ファイル選択されたら選択されたファイル名を表示
+      const addFileInputEventListener = (fileInputId, message) => {
+        const fileInput = document.getElementById(fileInputId);
+        const spanElement = fileInput.parentElement.querySelector("span");
+
+        fileInput.addEventListener("change", (event) => {
+          spanElement.textContent = event.target.files[0]?.name || message;
+        });
+      };
+      for (const [id, message] of [
+        ["tileMapJson", "Select your JsonFile"],
+        ["tileSetPng", "Select your PngFile"],
+        ["thumbnail", "Select your Thumbnail"],
+      ]) {
+        addFileInputEventListener(id, message);
+      }
+
+      // ファイルが選択されていない場合は、送信不可
+      const fileInputs = document.querySelectorAll('input[type="file"]');
+      const form = document.querySelector("form");
+      form.addEventListener("submit", (event) => {
+        let hasSelectedFile = true;
+        fileInputs.forEach((fileInput) => {
+          if (!fileInput.files.length) {
+            hasSelectedFile = false;
+          }
+        });
+        if (!hasSelectedFile) {
+          event.preventDefault();
+          alert("Please select a file for each field.");
+        }
+      });
+
+      // avatarのcheckboxの処理
+      const checkboxes = document.querySelectorAll(".rpgui-checkbox");
+      // 各checkbox要素にイベントリスナーを追加する
+      checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", function () {
+          // チェックされたcheckbox要素以外のすべてのcheckbox要素のチェックを外す
+          checkboxes.forEach((otherCheckbox) => {
+            if (otherCheckbox !== checkbox) {
+              otherCheckbox.checked = false;
+            }
+          });
+        });
+      });
+
+      // 各checkbox要素にイベントリスナーを追加する
+      checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", function () {
+          // チェックされたcheckbox要素のIDを取得して、コンソールログに出力する
+          if (checkbox.checked) {
+            console.log(checkbox.id + "がチェックされました");
+          }
+        });
       });
     </script>
   </body>
