@@ -1,3 +1,4 @@
+// console.log(configForIndex.canDisplayPlayerName);
 const config = {
   type: Phaser.AUTO,
   width: "100%",
@@ -186,22 +187,26 @@ function create() {
     .follower(phaserPlayerList[playerId], 0, 0, "shakeHand")
     .setVisible(false);
 
-  // プレイヤー名をtext要素で定義
-  playerName = createPlayerName(
-    this.add,
-    phaserPlayerList[playerId],
-    localStorage.getItem("playerName")
-  );
-  // プレイヤー名を中央寄せする
-  playerName.setOrigin(0.5, 0.5);
+  if (configForIndex.canDisplayPlayerName == "yes") {
+    // プレイヤー名をtext要素で定義
+    playerName = createPlayerName(
+      this.add,
+      phaserPlayerList[playerId],
+      localStorage.getItem("playerName")
+    );
+    // プレイヤー名を中央寄せする
+    playerName.setOrigin(0.5, 0.5);
+  }
 }
 
 function update(time, delta) {
   // プレイヤー名をプレイヤー座標の上に表示する
-  playerName.setPosition(
-    phaserPlayerList[playerId].x,
-    phaserPlayerList[playerId].y - 20
-  );
+  if (configForIndex.canDisplayPlayerName == "yes") {
+    playerName.setPosition(
+      phaserPlayerList[playerId].x,
+      phaserPlayerList[playerId].y - 20
+    );
+  }
   // 他のプレイヤーの生成処理;
   for (const webSocketPlayerId in webSocketPlayerList) {
     if (!phaserPlayerList.hasOwnProperty(webSocketPlayerId)) {
@@ -224,7 +229,9 @@ function update(time, delta) {
       continue;
     }
     if (!webSocketPlayerList.hasOwnProperty(phaserPlayerId)) {
-      anotherPlayerNameList[phaserPlayerId].destroy();
+      if (configForIndex.canDisplayPlayerName == "yes") {
+        anotherPlayerNameList[phaserPlayerId].destroy();
+      }
       phaserPlayerList[phaserPlayerId].disableBody(true, true);
       delete phaserPlayerList[phaserPlayerId];
     }
@@ -246,20 +253,25 @@ function update(time, delta) {
     if (webSocketPlayerId != playerId) {
       if (mapName == webSocketPlayerList[webSocketPlayerId].mapName) {
         //初回に各playerNameを作成・listに追加、その後は作成したplayerNameの位置を調整
+
         if (!anotherPlayerNameList[webSocketPlayerId]) {
-          anotherPlayerNameList[webSocketPlayerId] = createPlayerName(
-            this.add,
-            webSocketPlayerList[webSocketPlayerId],
-            webSocketPlayerList[webSocketPlayerId].playerName
-          );
-          anotherPlayerNameList[webSocketPlayerId].setOrigin(0.5, 0.5);
+          if (configForIndex.canDisplayPlayerName == "yes") {
+            anotherPlayerNameList[webSocketPlayerId] = createPlayerName(
+              this.add,
+              webSocketPlayerList[webSocketPlayerId],
+              webSocketPlayerList[webSocketPlayerId].playerName
+            );
+            anotherPlayerNameList[webSocketPlayerId].setOrigin(0.5, 0.5);
+          }
         } else {
           // console.log(webSocketPlayerId);
           // console.log(anotherPlayerNameList);
-          anotherPlayerNameList[webSocketPlayerId].setPosition(
-            webSocketPlayerList[webSocketPlayerId].x,
-            webSocketPlayerList[webSocketPlayerId].y - 10
-          );
+          if (configForIndex.canDisplayPlayerName == "yes") {
+            anotherPlayerNameList[webSocketPlayerId].setPosition(
+              webSocketPlayerList[webSocketPlayerId].x,
+              webSocketPlayerList[webSocketPlayerId].y - 10
+            );
+          }
           // anotherPlayerName.destroy();
         }
         phaserPlayerList[webSocketPlayerId].body.x =
@@ -415,12 +427,13 @@ const addMessageList = (message) => {
   const chat = document.getElementById("chat");
   const ul = document.getElementById("messageList");
   const li = document.createElement("p");
+  li.classList.add("useMyFont");
   const text = document.createTextNode(message.message);
   const name = document.createTextNode(message.playerName.data.text + ":");
   li.appendChild(name);
   li.appendChild(text);
   ul.appendChild(li);
-  // chat.scrollTo(0, ul.scrollHeight);
+  ul.scrollTo(0, ul.scrollHeight);
 };
 
 // queryからmapnameを取得
@@ -448,8 +461,28 @@ document.getElementById("sendButton").addEventListener("click", () => {
   document.getElementById("inputText").value = "";
 });
 
+// エンター押したらチャット送信
+document
+  .getElementById("inputText")
+  .addEventListener("keypress", keypress_event);
+
+function keypress_event(e) {
+  if (e.code === "Enter") {
+    let inputMessage = document.getElementById("inputText").value;
+    if (inputMessage === "") {
+      return;
+    }
+    socket.emit("sendMessage", {
+      message: inputMessage,
+      mapName: mapName,
+      playerName: playerName,
+    });
+    document.getElementById("inputText").value = "";
+  }
+  return false;
+}
 const sendMessageByEnterKey = (code) => {
-  console.log(code);
+  // console.log(code);
   //エンターキー押下なら
   if (13 === code) {
     let inputMessage = document.getElementById("inputText").value;
@@ -471,7 +504,7 @@ socket.on("receivePlayerInfo", (PlayerInfoList) => {
 
 // disconnectしたプレイヤーをdeletedPlayerIdから判断して削除
 socket.on("disconnectPlayer", (deletedPlayerId) => {
-  console.log(deletedPlayerId);
+  // console.log(deletedPlayerId);
   delete webSocketPlayerList[deletedPlayerId];
 });
 

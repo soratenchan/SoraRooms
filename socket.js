@@ -51,14 +51,29 @@ let mapConfig = {
 let serverWebSocketPlayerList = {};
 
 app.use(bodyParser.urlencoded({ extended: true }));
-
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
+  const mapName = req.query.map;
+  let config = JSON.parse(fs.readFileSync(`user-map/${mapName}/file.json`));
+  res.render(__dirname + "/index.ejs", {
+    data: { mapConfig: JSON.stringify(config) },
+  });
 });
 app.set("view engine", "ejs");
 app.get("/enter", (req, res) => {
+  const dirPath = "user-map";
+  const data2 = {};
+  fs.readdirSync(dirPath).forEach((dirName) => {
+    const filePath = path.join(dirPath, dirName, "file.json");
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      data2[dirName] = JSON.parse(content);
+    }
+  });
   const data = fs.readdirSync(__dirname + "/user-map");
-  res.render(__dirname + "/enter.ejs", { data: data });
+  res.render(__dirname + "/enter.ejs", {
+    data: data,
+    data2: JSON.stringify(data2),
+  });
 });
 app.get("/create", (req, res) => {
   res.sendFile(__dirname + "/createMap.html");

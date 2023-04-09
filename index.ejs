@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link href="/dist/rpgui.css" rel="stylesheet" type="text/css" />
+    <script src="/dist/rpgui.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://unpkg.com/nes.css@latest/css/nes.min.css"
+      rel="stylesheet"
+    />
+    <link href="/dist/rpgui.css" rel="stylesheet" type="text/css" />
+    <script
+      src="https://kit.fontawesome.com/3e8da217f3.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="/dist/rpgui.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <title>Phaser Template</title>
+    <style>
+      html,
+      body,
+      #game-container {
+        margin: 0;
+        padding: 0;
+      }
+
+      #game-container {
+        min-width: 76vw;
+        min-height: 90vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #game-container > canvas {
+        border-radius: 5px;
+      }
+      @font-face {
+        font-family: "MyFont";
+        src: url(/assets/PixelMplus12-Bold.ttf);
+      }
+      .useMyFont {
+        font-family: "MyFont";
+        font-size: 18px !important;
+      }
+      .inputUseMyFont {
+        font-size: 16px !important;
+      }
+      body {
+        font-family: MyFont;
+      }
+    </style>
+  </head>
+
+  <body style="font-family: 'DotGothic16', sans-serif">
+    <span id="idName"></span>
+    <div class="rpgui-content">
+      <div class="rpgui-container framed relative h-full">
+        <div class="flex flex-row pt-4">
+          <div class="relative" id="game-container">
+            <div class="absolute top-0 right-0 w-1/6">
+              <video
+                class="hidden"
+                style="transform: scale(-1, 1) rotate(-1, 1)"
+                id="js-local-stream"
+              ></video>
+              <div class="remote-streams" id="js-remote-streams"></div>
+            </div>
+          </div>
+          <div class="nes-container bg-white is-dark w-full p-0 flex flex-col">
+            <div class="flex flex-row">
+              <a class="nes-btn w-1/4" id="chat">
+                <i class="fa-solid fa-comments fa-2x"></i></a
+              ><a id="mikeOn" class="nes-btn w-1/4">
+                <i class="fa-2x fa-solid fa-microphone-slash fa-fw"></i
+              ></a>
+              <a id="mikeOff" class="hidden nes-btn w-1/4">
+                <i class="fa-solid fa-microphone fa-2x fa-fw"></i>
+              </a>
+              <a id="offVideo" class="hidden nes-btn w-1/4">
+                <i class="fa-solid fa-video fa-2x"></i></a
+              ><a id="onVideo" class="nes-btn w-1/4">
+                <i class="fa-solid fa-video-slash fa-2x"></i></a
+              ><a class="nes-btn w-1/4" id="shareScreen">
+                <i class="fa-solid fa-desktop fa-2x"></i
+              ></a>
+              <div id="shakeHandImg" class="">
+                <img width="30" src="./assets/shakehand.png" />
+              </div>
+            </div>
+            <a class="nes-btn is-success" id="js-join-trigger"
+              >join videoroom</a
+            >
+            <a class="nes-btn hidden is-warning" id="js-leave-trigger"
+              >leave videoroom</a
+            >
+            <!-- chatのdiv -->
+            <div class="flex flex-col justify-between w-full h-full">
+              <div class="p-4">
+                <div class="flex w-full">
+                  <ul
+                    class="space-y-4 text-gray-100 h-[518px] overflow-y-auto"
+                    id="messageList"
+                    style="font-family: 'DotGothic16', sans-serif"
+                  ></ul>
+                </div>
+              </div>
+              <div class="flex flex-row" id="sendChatForm">
+                <div class="bg-gray-400 p-2 flex-grow">
+                  <input
+                    class="bg-white flex items-center h-12 w-full rounded px-3 text-sm useMyFont inputUseMyFont"
+                    id="inputText"
+                    type="text"
+                    placeholder="コメントを入力…"
+                  />
+                </div>
+                <div
+                  class="p-0 w-16 flex items-center justify-center bg-gray-300"
+                  id="sendButton"
+                >
+                  <i class="fa-2x fa-solid fa-paper-plane text-white"></i>
+                </div>
+              </div>
+            </div>
+            <!-- chatのdiv -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const config = JSON.parse(`<%- data.mapConfig %>`);
+      const configForIndex = JSON.parse(`<%- data.mapConfig %>`);
+      // console.log(config);
+      const chat = document.getElementById("chat");
+      const mikeOn = document.getElementById("mikeOn");
+      const onVideo = document.getElementById("onVideo");
+      const shareScreen = document.getElementById("shareScreen");
+      const sendChatForm = document.getElementById("sendChatForm");
+      const jslocalstream = document.getElementById("js-local-stream");
+      const jsjointrigger = document.getElementById("js-join-trigger");
+      const jsleavetrigger = document.getElementById("js-leave-trigger");
+      if (config.canUseTextChat == "no") {
+        chat.setAttribute("class", "hidden");
+        sendChatForm.setAttribute("class", "hidden");
+      }
+      if (config.canUseVoiceChat == "no") {
+        mikeOn.setAttribute("class", "hidden");
+      }
+      // videoChat
+      if (config.canUseEmote == "no") {
+        jsjointrigger.textContent = "join voicechat";
+        jsleavetrigger.textContent = "leave voicechat";
+        onVideo.setAttribute("class", "hidden");
+        jslocalstream.setAttribute("class", "hidden");
+        shareScreen.setAttribute("class", "hidden");
+      }
+      if (config.canUseVoiceChat == "no" && config.canUseEmote == "no") {
+        jsjointrigger.setAttribute("class", "hidden");
+      }
+    </script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script src="./index.js" type="module"></script>
+    <script src="//cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
+    <script src="./script.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+  </body>
+</html>

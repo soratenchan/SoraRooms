@@ -10,8 +10,22 @@
       href="https://unpkg.com/nes.css@latest/css/nes.min.css"
       rel="stylesheet"
     />
+    <script
+      src="https://kit.fontawesome.com/3e8da217f3.js"
+      crossorigin="anonymous"
+    ></script>
     <link href="/dist/rpgui.css" rel="stylesheet" type="text/css" />
     <script src="/dist/rpgui.js"></script>
+    <style>
+      @font-face {
+        font-family: "MyFont";
+        src: url(/assets/PixelMplus12-Bold.ttf);
+      }
+      .useMyFont {
+        font-family: "MyFont";
+        font-size: 18px !important;
+      }
+    </style>
   </head>
   <body class="" style="background-color: #222">
     <div class="rpgui-content px-20 py-10" style="overflow-y: scroll">
@@ -45,7 +59,7 @@
                       <input
                         type="text"
                         id="inline_field"
-                        class="nes-input is-warning"
+                        class="nes-input is-warning useMyFont"
                         placeholder=""
                         name="mapName"
                         required
@@ -88,7 +102,7 @@
                     </div>
                   </div>
                   <div class="flex flex-row items-center justify-between">
-                    <p class="pt-6">Use emote feature?</p>
+                    <p class="pt-6">Use video chat?</p>
                     <div class="flex flex-row space-x-5">
                       <label class="text-center">
                         <input
@@ -169,10 +183,13 @@
             </dialog>
           </section>
           <header>
-            <h1 style="font-size: 250%">SORA MAPS!</h1>
+            <h1 style="font-size: 250%">SORA Rooms!</h1>
             <hr class="golden" />
-            <h2 style="font-size: 175%">
-              CSS &amp; JavaScript lib to create old-school GUI in seconds!
+            <h2 class="useMyFont" style="font-size: 175%">
+              2D空間で様々な人と交流しましょう！<br />
+              ルームによってチャットの有無・ボイスチャットの有無など設定が異なります
+              <br />右上のマップ作成ボタンからマップを作成できます！
+              <br />＊マップ作成にはtiledmapで作成されたファイルが必須となります。
             </h2>
           </header>
           <div class="flex items-center justify-center p-3 space-x-3">
@@ -194,7 +211,7 @@
                 type="text"
                 value="anonymous"
                 id="playerName"
-                class="nes-input"
+                class="nes-input useMyFont"
                 required
               />
             </div>
@@ -207,57 +224,55 @@
               <div class="flex justify-center space-x-7">
                 <div class="flex flex-col items-center justify-center">
                   <img
-                    id="misa"
                     width="40"
                     src="./assets/atlas/tuxemon-misa/misa-front.png"
                   />
                   <div class="flex pl-2.5 items-center justify-center">
                     <input
+                      checked
                       class="rpgui-checkbox pr-2"
                       type="checkbox"
-                      id="checkbox1"
+                      id="misa"
                     /><label></label>
                   </div>
                 </div>
-                <div class="flex flex-col items-center justify-center">
-                  <img
-                    id="misa"
-                    width="40"
-                    src="./assets/atlas/tuxemon-misa/misa-front.png"
-                  />
+                <div class="flex flex-col items-center justify-center pt-1">
+                  <img width="40" src="./assets/girlImage.png" />
                   <div class="flex pl-2.5 items-center justify-center">
                     <input
                       class="rpgui-checkbox pr-2"
                       type="checkbox"
-                      id="checkbox2"
+                      id="misa"
                     /><label></label>
                   </div>
                 </div>
-                <div class="flex flex-col items-center justify-center">
-                  <img
-                    id="misa"
-                    width="40"
-                    src="./assets/atlas/tuxemon-misa/misa-front.png"
-                  />
+                <div class="flex flex-col items-center justify-center pt-1">
+                  <img width="40" src="./assets/boyImage.png" />
                   <div class="flex pl-2.5 items-center justify-center">
                     <input
                       class="rpgui-checkbox pr-2"
                       type="checkbox"
-                      id="checkbox3"
+                      id="misa"
                     /><label></label>
                   </div>
                 </div>
-                <div class="flex flex-col items-center justify-center">
-                  <img
-                    id="misa"
-                    width="40"
-                    src="./assets/atlas/tuxemon-misa/misa-front.png"
-                  />
+                <div class="flex flex-col items-center justify-center pt-2">
+                  <img width="40" height="10" src="./assets/kingImage.png" />
                   <div class="flex pl-2.5 items-center justify-center">
                     <input
                       class="rpgui-checkbox pr-2"
                       type="checkbox"
-                      id="checkbox4"
+                      id="misa"
+                    /><label></label>
+                  </div>
+                </div>
+                <div class="flex flex-col items-center justify-center pt-7">
+                  <img width="40" src="./assets/dogImage.png" />
+                  <div class="flex pl-2.5 items-center justify-center">
+                    <input
+                      class="rpgui-checkbox pr-2"
+                      type="checkbox"
+                      id="misa"
                     /><label></label>
                   </div>
                 </div>
@@ -266,25 +281,29 @@
           </div>
           <div class="grid grid-cols-3 justify-center gap-6 px-3 pt-5">
             <% for(map of data) { %>
-            <!-- <div class="nes-container is-dark with-title space-y-2">
-              <p class="title"><%= map %></p>
-              <img
-                id="pokemon"
-                class="rounded-lg w-[426px] h-[340px] object-cover"
-                src="./thumbnails/<%= map %>.png"
-                alt=""
-              />
-              <a href="/?map=<%= map %>">
-                <button
-                  class="flex justify-center items-center w-full text-center rpgui-button golden"
-                  type="button"
-                >
-                  <p class="pt-2">Enter</p>
-                </button>
-              </a>
-            </div> -->
             <div class="rpgui-container framed-golden relative space-y-2">
-              <p><%= map %></p>
+              <div class="flex flex-row justify-between">
+                <p id="map"><%= map %></p>
+                <div class="flex flex-row space-x-2">
+                  <img
+                    id="chatimage"
+                    class="rounded-lg w-[24px] h-[24px] object-cover bg-white p-1"
+                    src="./assets/images/chatimage.png"
+                    alt=""
+                  /><img
+                    id="mikeimage"
+                    class="rounded-lg w-[24px] h-[24px] object-cover bg-white p-1"
+                    src="./assets/images/mikeimage.png"
+                    alt=""
+                  />
+                  <img
+                    id="cameraimage"
+                    class="rounded-lg w-[24px] h-[24px] object-cover bg-white p-1"
+                    src="./assets/images/cameraimage.png"
+                    alt=""
+                  />
+                </div>
+              </div>
               <img
                 id="pokemon"
                 class="rounded-lg w-[426px] h-[340px] object-cover"
@@ -310,7 +329,12 @@
       const inputElement = document.getElementById("playerName");
       const pokemonElement = document.getElementById("pokemon");
       const misa = document.getElementById("misa");
-      const dude = document.getElementById("dude");
+      const chatimage = document.getElementById("chatimage");
+      const mikeimage = document.getElementById("mikeimage");
+      const cameraimage = document.getElementById("cameraimage");
+
+      const data2 = JSON.parse(`<%- data2 %>`);
+      console.log(data2);
       inputElement.addEventListener("change", () => {
         localStorage.setItem("playerName", inputElement.value);
       });
@@ -320,9 +344,6 @@
         inputElement.value = "anonymous";
         localStorage.setItem("playerName", inputElement.value);
       }
-      misa.addEventListener("click", () => {
-        localStorage.setItem("avatar", "misa");
-      });
 
       // マップ作成モーダルのキャンセルボタンを押したときにモーダル閉じるように
       const cancelButton = document.querySelector(".dialog-menu .nes-btn");
@@ -386,10 +407,11 @@
         checkbox.addEventListener("change", function () {
           // チェックされたcheckbox要素のIDを取得して、コンソールログに出力する
           if (checkbox.checked) {
-            console.log(checkbox.id + "がチェックされました");
+            localStorage.setItem("avatar", checkbox.id);
           }
         });
       });
+      localStorage.setItem("avatar", "misa");
     </script>
   </body>
 </html>
