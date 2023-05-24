@@ -1,1 +1,7 @@
-{"canDisplayPlayerName":"no","canUseEmote":"no","canUseTextChat":"no","canUseVoiceChat":"no"}
+{
+  "canDisplayPlayerName": "no",
+  "canUseEmote": "no",
+  "canUseTextChat": "no",
+  "canUseVoiceChat": "no",
+  "gameGenre": "その他"
+}

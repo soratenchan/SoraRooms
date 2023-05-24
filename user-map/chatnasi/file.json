@@ -1,1 +1,7 @@
-{"canDisplayPlayerName":"yes","canUseEmote":"no","canUseTextChat":"no","canUseVoiceChat":"yes"}
+{
+  "canDisplayPlayerName": "yes",
+  "canUseEmote": "no",
+  "canUseTextChat": "no",
+  "canUseVoiceChat": "yes",
+  "gameGenre": "LOL"
+}

@@ -15,21 +15,23 @@ const Peer = window.Peer;
 
   const getRoomModeByHash = () => (location.hash === "#sfu" ? "sfu" : "mesh");
   let screenStream;
-  // let localStream = await navigator.mediaDevices
-  //   .getUserMedia({
-  //     video: true,
-  //   })
-  //   .catch(console.error);
-  // localVideo.muted = true;
-  // localVideo.srcObject = localStream;
-  // localVideo.playsInline = true;
-  // await localVideo.play().catch(console.error);
-  // localStream.getVideoTracks()[0].enabled = false;
+  let localStream = await navigator.mediaDevices
+    .getUserMedia({
+      video: true,
+      audio: false,
+    })
+    .catch(console.error);
+  localVideo.muted = true;
+  localVideo.srcObject = localStream;
+  localVideo.playsInline = true;
+  await localVideo.play().catch(console.error);
+  localStream.getVideoTracks()[0].enabled = false;
   // localStream.getAudioTracks()[0].enabled = false;
 
   let audioStream = await navigator.mediaDevices
     .getUserMedia({
       audio: true,
+      video: false,
     })
     .catch(console.error);
   audioStream.getAudioTracks()[0].enabled = false;
@@ -52,20 +54,20 @@ const Peer = window.Peer;
 
   joinTrigger.addEventListener("click", async () => {
     if (config.canUseEmote == "yes") {
-      // localVideo.setAttribute(
-      //   "class",
-      //   "nes-container is-rounded is-dark rounded-lg"
-      // );
+      localVideo.setAttribute(
+        "class",
+        "nes-container is-rounded is-dark rounded-lg"
+      );
     }
     joinTrigger.setAttribute("class", "hidden");
     leaveTrigger.setAttribute("class", "nes-btn is-warning");
-    // if (!peer.open) {
-    //   return;
-    // }
+    if (!peer.open) {
+      return;
+    }
     const mapName = getParam("map");
     let room = peer.joinRoom(mapName, {
       mode: getRoomModeByHash(),
-      // stream: localStream,
+      stream: localStream,
     });
     let audioRoom = audioPeer.joinRoom(mapName, {
       mode: getRoomModeByHash(),
@@ -80,6 +82,7 @@ const Peer = window.Peer;
       // ul.appendChild(li);
     });
     room.on("peerJoin", (peerId) => {
+      console.error("roomPeer", peerId);
       // const ul = document.getElementById("messageList");
       // const li = document.createElement("li");
       // const text = document.createTextNode(` ${peerId}さんが参加しました\n`);
@@ -88,44 +91,45 @@ const Peer = window.Peer;
     });
 
     room.on("stream", async (stream) => {
-      // const newVideo = document.createElement("video");
-      // newVideo.srcObject = stream;
-      // newVideo.playsInline = true;
-      // newVideo.setAttribute("data-peer-id", stream.peerId);
-      // newVideo.setAttribute("style", "transform: scale(-1, 1) rotate(-1, 1)");
-      // newVideo.setAttribute("state", "small");
-      // newVideo.setAttribute(
-      //   "class",
-      //   "nes-container is-rounded is-dark rounded-lg"
-      // );
-      // remoteVideos.append(newVideo);
-      // await newVideo.play().catch(console.error);
-      // newVideo.addEventListener("click", (e) => {
-      //   if (e.target.getAttribute("state") === "small") {
-      //     // console.log("small");
-      //     e.target.setAttribute(
-      //       "style",
-      //       "transform: scale(-0.6, 0.6) rotate(-1, 1);"
-      //     );
-      //     e.target.setAttribute("state", "big");
-      //     e.target.setAttribute("class", "fixed top-0 left-0 z-10");
-      //   } else {
-      //     // console.log("big");
-      //     e.target.setAttribute("state", "small");
-      //     e.target.setAttribute(
-      //       "style",
-      //       "transform: scale(-1, 1) rotate(-1, 1)"
-      //     );
-      //     e.target.setAttribute(
-      //       "class",
-      //       "nes-container is-rounded is-dark rounded-lg"
-      //     );
-      //   }
-      //   // console.log(e);
-      // });
-      // if (config.canUseEmote == "no") {
-      //   newVideo.setAttribute("class", "hidden");
-      // }
+      const newVideo = document.createElement("video");
+      newVideo.srcObject = stream;
+      newVideo.playsInline = true;
+      newVideo.setAttribute("data-peer-id", stream.peerId);
+      newVideo.setAttribute("style", "transform: scale(-1, 1) rotate(-1, 1)");
+      newVideo.setAttribute("state", "small");
+      newVideo.setAttribute(
+        "class",
+        "nes-container is-rounded is-dark rounded-lg"
+      );
+      newVideo.muted = true;
+      remoteVideos.append(newVideo);
+      await newVideo.play().catch(console.error);
+      newVideo.addEventListener("click", (e) => {
+        if (e.target.getAttribute("state") === "small") {
+          // console.log("small");
+          e.target.setAttribute(
+            "style",
+            "transform: scale(-0.6, 0.6) rotate(-1, 1);"
+          );
+          e.target.setAttribute("state", "big");
+          e.target.setAttribute("class", "fixed top-0 left-0 z-10");
+        } else {
+          // console.log("big");
+          e.target.setAttribute("state", "small");
+          e.target.setAttribute(
+            "style",
+            "transform: scale(-1, 1) rotate(-1, 1)"
+          );
+          e.target.setAttribute(
+            "class",
+            "nes-container is-rounded is-dark rounded-lg"
+          );
+        }
+        // console.log(e);
+      });
+      if (config.canUseEmote == "no") {
+        newVideo.setAttribute("class", "hidden");
+      }
     });
 
     room.on("data", ({ data, src }) => {
@@ -133,12 +137,12 @@ const Peer = window.Peer;
     });
 
     room.on("peerLeave", (peerId) => {
-      // const remoteVideo = remoteVideos.querySelector(
-      //   `[data-peer-id="${peerId}"]`
-      // );
-      // remoteVideo.srcObject.getTracks().forEach((track) => track.stop());
-      // remoteVideo.srcObject = null;
-      // remoteVideo.remove();
+      const remoteVideo = remoteVideos.querySelector(
+        `[data-peer-id="${peerId}"]`
+      );
+      remoteVideo.srcObject.getTracks().forEach((track) => track.stop());
+      remoteVideo.srcObject = null;
+      remoteVideo.remove();
       // const ul = document.getElementById("messageList");
       // const li = document.createElement("li");
       // const text = document.createTextNode(`${peerId}さんが離席しました\n`);
@@ -152,11 +156,70 @@ const Peer = window.Peer;
       // const text = document.createTextNode("ビデオ通話から離席しました");
       // li.appendChild(text);
       // ul.appendChild(li);
-      // Array.from(remoteVideos.children).forEach((remoteVideo) => {
-      //   remoteVideo.srcObject.getTracks().forEach((track) => track.stop());
-      //   remoteVideo.srcObject = null;
-      //   remoteVideo.remove();
-      // });
+      Array.from(remoteVideos.children).forEach((remoteVideo) => {
+        remoteVideo.srcObject.getTracks().forEach((track) => track.stop());
+        remoteVideo.srcObject = null;
+        remoteVideo.remove();
+      });
+    });
+    audioRoom.on("peerJoin", (peerId) => {});
+    audioRoom.on("stream", async (stream) => {
+      const newVideo = document.createElement("video");
+      newVideo.srcObject = stream;
+      newVideo.playsInline = true;
+      newVideo.setAttribute("data-peer-id", stream.peerId);
+      newVideo.setAttribute("style", "transform: scale(-1, 1) rotate(-1, 1)");
+      newVideo.setAttribute("state", "small");
+      newVideo.setAttribute("class", "hidden");
+      remoteVideos.append(newVideo);
+      await newVideo.play().catch(console.error);
+      newVideo.addEventListener("click", (e) => {
+        if (e.target.getAttribute("state") === "small") {
+          // console.log("small");
+          e.target.setAttribute(
+            "style",
+            "transform: scale(-0.6, 0.6) rotate(-1, 1);"
+          );
+          e.target.setAttribute("state", "big");
+          e.target.setAttribute("class", "fixed top-0 left-0 z-10");
+        } else {
+          // console.log("big");
+          e.target.setAttribute("state", "small");
+          e.target.setAttribute(
+            "style",
+            "transform: scale(-1, 1) rotate(-1, 1)"
+          );
+          e.target.setAttribute(
+            "class",
+            "nes-container is-rounded is-dark rounded-lg"
+          );
+        }
+        // console.log(e);
+      });
+      if (config.canUseEmote == "no") {
+        newVideo.setAttribute("class", "hidden");
+      }
+    });
+
+    audioRoom.on("data", ({ data, src }) => {
+      messages.textContent += `${src}: ${data}\n`;
+    });
+
+    audioRoom.on("peerLeave", (peerId) => {
+      const remoteVideo = remoteVideos.querySelector(
+        `[data-peer-id="${peerId}"]`
+      );
+      remoteVideo.srcObject.getTracks().forEach((track) => track.stop());
+      remoteVideo.srcObject = null;
+      remoteVideo.remove();
+    });
+
+    audioRoom.once("close", () => {
+      Array.from(remoteVideos.children).forEach((remoteVideo) => {
+        remoteVideo.srcObject.getTracks().forEach((track) => track.stop());
+        remoteVideo.srcObject = null;
+        remoteVideo.remove();
+      });
     });
 
     leaveTrigger.addEventListener(
@@ -164,7 +227,7 @@ const Peer = window.Peer;
       () => {
         leaveTrigger.setAttribute("class", "hidden");
         joinTrigger.setAttribute("class", "nes-btn is-success");
-        // room.close();
+        room.close();
         audioRoom.close();
       },
       { once: true }
@@ -172,46 +235,48 @@ const Peer = window.Peer;
 
     // ボタン処理関連
     onVideo.addEventListener("click", async () => {
-      // screenStream
-      //   ? screenStream.getTracks().forEach((track) => track.stop())
-      //   : null;
-      // localStream = await navigator.mediaDevices
-      //   .getUserMedia({
-      //     // audio: true,
-      //     video: true,
-      //   })
-      //   .catch(console.error);
-      // localVideo.muted = true;
-      // localVideo.srcObject = localStream;
-      // localVideo.playsInline = true;
-      // await localVideo.play().catch(console.error);
-      // if (localStream) {
-      //   room.replaceStream(localStream);
-      //   localStream.getVideoTracks()[0].enabled = true;
-      //   onVideo.setAttribute("class", "hidden");
-      //   offVideo.setAttribute("class", "nes-btn w-1/4");
-      // }
+      screenStream
+        ? screenStream.getTracks().forEach((track) => track.stop())
+        : null;
+      localStream = await navigator.mediaDevices
+        .getUserMedia({
+          // audio: true,
+          video: true,
+        })
+        .catch(console.error);
+
+      localVideo.muted = true;
+      localVideo.srcObject = localStream;
+      localVideo.playsInline = true;
+      await localVideo.play().catch(console.error);
+      if (localStream) {
+        room.replaceStream(localStream);
+        localStream.getVideoTracks()[0].enabled = true;
+        onVideo.setAttribute("class", "hidden");
+        offVideo.setAttribute("class", "nes-btn w-1/4");
+      }
     });
     offVideo.addEventListener("click", async () => {
-      // screenStream
-      //   ? screenStream.getTracks().forEach((track) => track.stop())
-      //   : null;
-      // localStream = await navigator.mediaDevices
-      //   .getUserMedia({
-      //     // audio: true,
-      //     video: true,
-      //   })
-      //   .catch(console.error);
-      // localVideo.muted = true;
-      // localVideo.srcObject = localStream;
-      // localVideo.playsInline = true;
-      // await localVideo.play().catch(console.error);
-      // if (localStream) {
-      //   room.replaceStream(localStream);
-      //   localStream.getVideoTracks()[0].enabled = false;
-      //   offVideo.setAttribute("class", "hidden");
-      //   onVideo.setAttribute("class", "nes-btn w-1/4");
-      // }
+      screenStream
+        ? screenStream.getTracks().forEach((track) => track.stop())
+        : null;
+      localStream = await navigator.mediaDevices
+        .getUserMedia({
+          // audio: true,
+          video: true,
+        })
+        .catch(console.error);
+
+      localVideo.muted = true;
+      localVideo.srcObject = localStream;
+      localVideo.playsInline = true;
+      await localVideo.play().catch(console.error);
+      if (localStream) {
+        room.replaceStream(localStream);
+        localStream.getVideoTracks()[0].enabled = false;
+        offVideo.setAttribute("class", "hidden");
+        onVideo.setAttribute("class", "nes-btn w-1/4");
+      }
     });
     // // マイクon・off
     mikeOff.addEventListener("click", async () => {
@@ -241,16 +306,16 @@ const Peer = window.Peer;
           video: true,
         })
         .catch(console.error);
-      // localVideo.muted = true;
-      // localVideo.srcObject = screenStream;
-      // localVideo.playsInline = true;
-      // await localVideo.play().catch(console.error);
-      // const mapName = getParam("map");
-      // room.replaceStream(screenStream);
+      localVideo.muted = true;
+      localVideo.srcObject = screenStream;
+      localVideo.playsInline = true;
+      await localVideo.play().catch(console.error);
+      const mapName = getParam("map");
+      room.replaceStream(screenStream);
     });
   });
 
-  // peer.on("error", console.error);
+  peer.on("error", console.error);
 })();
 
 function getParam(name, url) {

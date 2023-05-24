@@ -13,7 +13,7 @@ const updir = path.resolve(__dirname, "./tempMap"); // アプリケーション�
 // 初期化
 const io = socketIo(server);
 
-const PORT = 3000;
+const PORT = 5500;
 
 const storage = multer.diskStorage({
   destination(req, file, callback) {
@@ -46,6 +46,7 @@ let mapConfig = {
   canUseEmote: "no",
   canUseTextChat: "no",
   canUseVoiceChat: "no",
+  gameGenre: "",
 };
 
 let serverWebSocketPlayerList = {};
@@ -72,11 +73,20 @@ app.get("/enter", (req, res) => {
   const data = fs.readdirSync(__dirname + "/user-map");
   res.render(__dirname + "/enter.ejs", {
     data: data,
-    data2: JSON.stringify(data2),
+    data2: data2,
   });
 });
 app.get("/create", (req, res) => {
   res.sendFile(__dirname + "/createMap.html");
+});
+app.get("/login", (req, res) => {
+  res.sendFile(__dirname + "/login.html");
+});
+app.get("/firebase-init.js", (req, res) => {
+  res.sendFile(__dirname + "/firebase-init.js");
+});
+app.get("/authentication.js", (req, res) => {
+  res.sendFile(__dirname + "/authentication.js");
 });
 app.get("/index.js", (req, res) => {
   res.sendFile(__dirname + "/index.js");
@@ -88,6 +98,7 @@ app.use("/assets", express.static("assets"));
 app.use("/user-map", express.static("user-map"));
 app.use("/thumbnails", express.static("thumbnails"));
 app.use("/dist", express.static("dist"));
+app.use("/room", express.static("room"));
 
 // createMapから送られてきたmapNameのvalueでフォルダを作成し、2つのファイルを格納
 app.post("/createMap", upload.fields(namedOption), (req, res) => {
@@ -124,6 +135,7 @@ app.post("/createMap", upload.fields(namedOption), (req, res) => {
   mapConfig.canUseEmote = req.body.canUseEmote;
   mapConfig.canUseTextChat = req.body.canUseTextChat;
   mapConfig.canUseVoiceChat = req.body.canUseVoiceChat;
+  mapConfig.gameGenre = req.body.gameGenre;
   const jsonMapConfig = JSON.stringify(mapConfig);
   fs.writeFile(
     `user-map/${req.body.mapName}/file.json`,

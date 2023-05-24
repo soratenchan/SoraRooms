@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase Authentication</title>
+  </head>
+  <body>
+    <!-- サインアップフォーム -->
+    <form id="signup-form">
+      <h2>新規登録</h2>
+      <input type="email" id="signup-email" placeholder="Email" required />
+      <input
+        type="password"
+        id="signup-password"
+        placeholder="Password"
+        required
+      />
+      <input id="favorite-game" placeholder="好きなゲーム" required />
+      <button type="submit">サインアップ</button>
+    </form>
+
+    <!-- ログインフォーム -->
+    <form id="login-form">
+      <h2>ログイン</h2>
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">ログイン</button>
+    </form>
+
+    <!-- ログアウトボタン -->
+    <button id="logout-button" style="display: none">ログアウト</button>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
+      import "https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js";
+      import "https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js";
+    </script>
+    <script type="module" src="firebase-init.js"></script>
+    <script type="module" src="authentication.js"></script>
+  </body>
+</html>

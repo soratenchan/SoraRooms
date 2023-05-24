@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Sora Rooms</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://unpkg.com/nes.css@latest/css/nes.min.css"
@@ -25,6 +25,10 @@
         font-family: "MyFont";
         font-size: 18px !important;
       }
+      .useMyFontFilter {
+        font-family: "MyFont";
+        font-size: 14px !important;
+      }
     </style>
   </head>
   <body class="" style="background-color: #222">
@@ -33,13 +37,32 @@
         <!-- rpgui goes here -->
         <div class="rpgui-container framed relative h-full">
           <section class="flex pt-3 px-5 justify-end">
-            <button
-              type="button"
-              class="nes-btn is-primary"
-              onclick="document.getElementById('dialog-dark-rounded').showModal();"
-            >
-              Create Map!
-            </button>
+            <div class="flex flex-row space-x-3">
+              <button
+                id="loginButton"
+                type="button"
+                class="nes-btn is-success"
+                onclick="document.getElementById('dialog-dark-rounded-login').showModal();"
+              >
+                Login!
+              </button>
+              <!-- ログアウトボタン -->
+              <button
+                id="logout-button"
+                class="nes-btn is-warning"
+                style="display: none"
+              >
+                Logout!
+              </button>
+              <button
+                type="button"
+                class="nes-btn is-primary"
+                onclick="document.getElementById('dialog-dark-rounded').showModal();"
+              >
+                Create Map!
+              </button>
+            </div>
+            <!--マップ作成用モーダル -->
             <dialog
               class="nes-dialog is-dark is-rounded w-[620px]"
               id="dialog-dark-rounded"
@@ -170,6 +193,23 @@
                       </label>
                     </div>
                   </div>
+                  <div class="flex flex-row items-center justify-between pt-6">
+                    <label for="default_select">Game Genre</label>
+                    <div class="nes-select">
+                      <select required id="default_select" name="gameGenre">
+                        <option value="" disabled selected hidden>
+                          Select...
+                        </option>
+                        <option value="APEX LEGENDS">APEX LEGENDS</option>
+                        <option value="VALORANT">VALORANT</option>
+                        <option value="OVERWATCH2">OVERWATCH2</option>
+                        <option value="Splatoon3">Splatoon3</option>
+                        <option value="スマブラSP">スマブラSP</option>
+                        <option value="LOL">LOL</option>
+                        <option value="その他">その他</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
                 <menu
                   class="pt-5 space-x-3 dialog-menu flex items-end justify-end"
@@ -181,7 +221,166 @@
                 </menu>
               </form>
             </dialog>
+
+            <!-- ログイン用モーダル -->
+            <dialog
+              class="nes-dialog is-dark is-rounded w-[620px]"
+              id="dialog-dark-rounded-login"
+            >
+              <h1 class="text-center title">Login Form</h1>
+
+              <!-- ログインフォーム -->
+              <form id="login-form">
+                <div class="space-y-5">
+                  <div class="flex flex-col nes-field is-inline">
+                    <input
+                      class="nes-input is-success"
+                      type="email"
+                      id="email"
+                      placeholder="Email"
+                      required
+                    />
+                  </div>
+                  <div class="flex flex-col nes-field is-inline">
+                    <input
+                      class="nes-input is-success useMyFont"
+                      type="password"
+                      id="password"
+                      placeholder="Password"
+                      required
+                    />
+                  </div>
+                </div>
+                <menu
+                  class="pt-5 space-x-3 dialog-menu flex items-end justify-end"
+                >
+                  <button class="nes-btn" id="loginModalCancel">Cancel</button>
+                  <button type="submit" class="nes-btn is-primary">
+                    Login
+                  </button>
+                </menu>
+              </form>
+              <button
+                id="signUpButtonInLoginModal"
+                type="button"
+                class="nes-btn is-primary w-full mt-5"
+                onclick="document.getElementById('dialog-dark-rounded-signUp').showModal();"
+              >
+                Sign Up
+              </button>
+            </dialog>
+
+            <!-- 新規登録用モーダル -->
+            <dialog
+              class="nes-dialog is-dark is-rounded w-[620px]"
+              id="dialog-dark-rounded-signUp"
+            >
+              <h1 class="text-center title">Sign Up Form</h1>
+              <!-- 新規登録フォーム -->
+              <form id="signup-form">
+                <div class="space-y-5">
+                  <div class="flex flex-col nes-field is-inline">
+                    <input
+                      type="email"
+                      id="signup-email"
+                      placeholder="Email"
+                      required
+                      class="nes-input is-success"
+                    />
+                  </div>
+                  <div class="flex flex-col nes-field is-inline">
+                    <input
+                      type="password"
+                      class="nes-input is-success"
+                      id="signup-password"
+                      placeholder="Password"
+                      required
+                    />
+                  </div>
+                  <div class="flex flex-col nes-field is-inline">
+                    <input
+                      class="nes-input is-success"
+                      id="favorite-game"
+                      placeholder="favorite Game"
+                      required
+                    />
+                  </div>
+                  <div class="">
+                    <p class="text-left">Use Platform</p>
+                    <div
+                      class="flex flex-row justify-evenly items-center space-x-5"
+                    >
+                      <label>
+                        <input
+                          type="checkbox"
+                          class="nes-checkbox is-dark"
+                          value="pc"
+                          onchange="getCheckedValues()"
+                        />
+                        <span
+                          ><img
+                            src="./assets/gameLogo/pc-logo.png"
+                            width="40"
+                            alt=""
+                        /></span>
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          class="nes-checkbox is-dark"
+                          value="playstation"
+                          onchange="getCheckedValues()"
+                        />
+                        <span
+                          ><img
+                            src="./assets/gameLogo/playstation-icon.webp"
+                            width="40"
+                            alt=""
+                        /></span> </label
+                      ><label>
+                        <input
+                          type="checkbox"
+                          class="nes-checkbox is-dark"
+                          value="switch"
+                          onchange="getCheckedValues()"
+                        />
+                        <span
+                          ><img
+                            src="./assets/gameLogo/switch-logo.png"
+                            width="40"
+                            alt=""
+                        /></span> </label
+                      ><label>
+                        <input
+                          type="checkbox"
+                          class="nes-checkbox is-dark"
+                          value="xbox"
+                          onchange="getCheckedValues()"
+                        />
+                        <span
+                          ><img
+                            src="./assets/gameLogo/xbox-logo.png"
+                            width="40"
+                            alt=""
+                        /></span>
+                      </label>
+                    </div>
+                  </div>
+                  <!-- <button type="submit">サインアップ</button> -->
+                </div>
+                <menu
+                  class="pt-5 space-x-3 dialog-menu flex items-end justify-end"
+                >
+                  <button class="nes-btn" id="signUpModalCancel">Cancel</button>
+                  <button type="submit" class="nes-btn is-primary">
+                    Register
+                  </button>
+                </menu>
+              </form>
+            </dialog>
           </section>
+
+          <!-- LP -->
           <header>
             <h1 style="font-size: 250%">SORA Rooms!</h1>
             <hr class="golden" />
@@ -193,16 +392,6 @@
             </h2>
           </header>
           <div class="flex items-center justify-center p-3 space-x-3">
-            <!-- <label class="block text-sm font-medium leading-6 text-gray-900"
-              >Your Name</label
-            >
-            <div class="">
-              <input
-                class="block w-64 rounded-md border-0 px-1 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                value="anonymous"
-                id="playerName"
-              />
-            </div> -->
             <div class="nes-field space-y-3 flex flex-col items-center">
               <label class="nes-text is-success" for="name_field"
                 >Your name</label
@@ -232,44 +421,55 @@
                       checked
                       class="rpgui-checkbox pr-2"
                       type="checkbox"
-                      id="misa"
+                      id="atlas"
                     /><label></label>
                   </div>
                 </div>
-                <div class="flex flex-col items-center justify-center pt-1">
-                  <img width="40" src="./assets/girlImage.png" />
+                <div class="flex flex-col items-center justify-center">
+                  <img
+                    width="40"
+                    src="./assets/atlas-purple/tuxemon-misa/misa-purple-front.png"
+                  />
                   <div class="flex pl-2.5 items-center justify-center">
                     <input
                       class="rpgui-checkbox pr-2"
                       type="checkbox"
-                      id="misa"
+                      id="atlas-purple"
                     /><label></label>
                   </div>
                 </div>
-                <div class="flex flex-col items-center justify-center pt-1">
-                  <img width="40" src="./assets/boyImage.png" />
+                <div class="flex flex-col items-center justify-center">
+                  <img
+                    width="40"
+                    src="./assets/atlas-blue/tuxemon-misa/misa-blue-front.png"
+                  />
                   <div class="flex pl-2.5 items-center justify-center">
                     <input
                       class="rpgui-checkbox pr-2"
                       type="checkbox"
-                      id="misa"
+                      id="atlas-blue"
                     /><label></label>
                   </div>
                 </div>
-                <div class="flex flex-col items-center justify-center pt-2">
-                  <img width="40" height="10" src="./assets/kingImage.png" />
+                <div class="flex flex-col items-center justify-center">
+                  <img
+                    width="40"
+                    height="10"
+                    src="./assets/atlas-green/tuxemon-misa/misa-green-front.png"
+                  />
                   <div class="flex pl-2.5 items-center justify-center">
                     <input
                       class="rpgui-checkbox pr-2"
                       type="checkbox"
-                      id="misa"
+                      id="atlas-green"
                     /><label></label>
                   </div>
                 </div>
-                <div class="flex flex-col items-center justify-center pt-7">
+                <div class="flex flex-col items-center justify-center pt-9">
                   <img width="40" src="./assets/dogImage.png" />
                   <div class="flex pl-2.5 items-center justify-center">
                     <input
+                      disabled
                       class="rpgui-checkbox pr-2"
                       type="checkbox"
                       id="misa"
@@ -279,29 +479,85 @@
               </div>
             </div>
           </div>
-          <div class="grid grid-cols-3 justify-center gap-6 px-3 pt-5">
+          <div class="flex flex-row space-x-5 px-5 pt-12">
+            <div class="nes-select is-success w-[164px]">
+              <select required id="success_select">
+                <option value="0">Sort A-Z</option>
+                <option value="1">Sort Z-A</option>
+              </select>
+            </div>
+            <div class="nes-select is-success w-[246px] useMyFontFilter">
+              <select required id="success_select_filter">
+                <option value="0">ALL</option>
+                <option value="1">APEX LEGENDS</option>
+                <option value="2">VALORANT</option>
+                <option value="3">OVERWATCH2</option>
+                <option value="4">Splatoon3</option>
+                <option value="5">スマブラSP</option>
+                <option value="6">LOL</option>
+                <option value="7">その他</option>
+              </select>
+            </div>
+          </div>
+
+          <div
+            class="grid grid-cols-3 justify-center gap-6 px-3 pt-5"
+            id="map-grid"
+          >
             <% for(map of data) { %>
-            <div class="rpgui-container framed-golden relative space-y-2">
+            <div
+              class="rpgui-container framed-golden relative space-y-2"
+              name="map-div"
+            >
+              <input
+                type="hidden"
+                value="<%= data2[map].gameGenre %>"
+                name="sort-key-game-genre"
+              />
+              <input
+                type="hidden"
+                value="<%= map %>"
+                name="sort-key-map-name"
+              />
               <div class="flex flex-row justify-between">
                 <p id="map"><%= map %></p>
                 <div class="flex flex-row space-x-2">
+                  <% if (data2[map].gameGenre == "APEX LEGENDS") { %>
+                  <img
+                    id="chatimage"
+                    class="rounded-lg w-[24px] h-[24px] object-cover bg-white p-1"
+                    src="./assets/gameLogo/apexLogo.png"
+                    alt=""
+                  />
+                  <% } if (data2[map].gameGenre == "VALORANT") { %>
+                  <img
+                    id="chatimage"
+                    class="rounded-lg w-[24px] h-[24px] object-cover bg-white p-1"
+                    src="./assets/gameLogo/valorantLogo.png"
+                    alt=""
+                  />
+                  <% } if (data2[map].canUseTextChat == "yes") { %>
                   <img
                     id="chatimage"
                     class="rounded-lg w-[24px] h-[24px] object-cover bg-white p-1"
                     src="./assets/images/chatimage.png"
                     alt=""
-                  /><img
+                  />
+                  <% } if (data2[map].canUseVoiceChat == "yes") { %>
+                  <img
                     id="mikeimage"
                     class="rounded-lg w-[24px] h-[24px] object-cover bg-white p-1"
                     src="./assets/images/mikeimage.png"
                     alt=""
                   />
+                  <% } if (data2[map].canUseEmote == "yes") { %>
                   <img
                     id="cameraimage"
                     class="rounded-lg w-[24px] h-[24px] object-cover bg-white p-1"
                     src="./assets/images/cameraimage.png"
                     alt=""
                   />
+                  <% } %>
                 </div>
               </div>
               <img
@@ -324,7 +580,6 @@
         </div>
       </div>
     </div>
-
     <script>
       const inputElement = document.getElementById("playerName");
       const pokemonElement = document.getElementById("pokemon");
@@ -332,9 +587,9 @@
       const chatimage = document.getElementById("chatimage");
       const mikeimage = document.getElementById("mikeimage");
       const cameraimage = document.getElementById("cameraimage");
+      const mapDiv = document.getElementsByName("map-div");
+      let checkedValues;
 
-      const data2 = JSON.parse(`<%- data2 %>`);
-      console.log(data2);
       inputElement.addEventListener("change", () => {
         localStorage.setItem("playerName", inputElement.value);
       });
@@ -345,6 +600,14 @@
         localStorage.setItem("playerName", inputElement.value);
       }
 
+      function closeModalAndResetForm(event, formId, dialogId) {
+        event.preventDefault(); // ボタンの既定の動作をキャンセルする
+        const form = document.getElementById(formId);
+        form.reset(); // フォームの内容をリセットする
+        const dialog = document.getElementById(dialogId);
+        dialog.close(); // ダイアログを閉じる
+      }
+
       // マップ作成モーダルのキャンセルボタンを押したときにモーダル閉じるように
       const cancelButton = document.querySelector(".dialog-menu .nes-btn");
       cancelButton.addEventListener("click", (event) => {
@@ -352,6 +615,38 @@
         const form = document.querySelector("form");
         form.reset(); // フォームの内容をリセットする
         const dialog = document.querySelector("dialog");
+        dialog.close(); // ダイアログを閉じる
+      });
+
+      // ログインモーダルのキャンセルボタンを押したときにモーダル閉じるように
+      const loginCancelButton = document.getElementById("loginModalCancel");
+      loginCancelButton.addEventListener("click", (event) => {
+        event.preventDefault(); // ボタンの既定の動作をキャンセルする
+        const form = document.getElementById("login-form");
+        form.reset(); // フォームの内容をリセットする
+        const dialog = document.getElementById("dialog-dark-rounded-login");
+        dialog.close(); // ダイアログを閉じる
+      });
+
+      // 新規登録ボタンを押したときにモーダル閉じるように
+      const signUpButtonInLoginModal = document.getElementById(
+        "signUpButtonInLoginModal"
+      );
+      signUpButtonInLoginModal.addEventListener("click", (event) => {
+        event.preventDefault(); // ボタンの既定の動作をキャンセルする
+        const form = document.getElementById("login-form");
+        form.reset(); // フォームの内容をリセットする
+        const dialog = document.getElementById("dialog-dark-rounded-login");
+        dialog.close(); // ダイアログを閉じる
+      });
+
+      // 新規登録モーダルのキャンセルボタンを押したときにモーダル閉じるように
+      const singUpCancelButton = document.getElementById("signUpModalCancel");
+      singUpCancelButton.addEventListener("click", (event) => {
+        event.preventDefault(); // ボタンの既定の動作をキャンセルする
+        const form = document.getElementById("signup-form");
+        form.reset(); // フォームの内容をリセットする
+        const dialog = document.getElementById("dialog-dark-rounded-signUp");
         dialog.close(); // ダイアログを閉じる
       });
 
@@ -411,7 +706,173 @@
           }
         });
       });
-      localStorage.setItem("avatar", "misa");
+      localStorage.setItem("avatar", "atlas");
+
+      document
+        .getElementById("success_select")
+        .addEventListener("change", function (event) {
+          if (event.target.value === "0") {
+            sortElementsReverse("sort-key-map-name");
+          } else if (event.target.value === "1") {
+            sortElements("sort-key-map-name");
+          }
+        });
+
+      // sortFunc
+      const sortElements = (sortKey) => {
+        for (var i = 0; i < mapDiv.length; i++) {
+          //後ろから前に向かって小さい値を浮かび上がらせるfor文
+          let tmpIndex = i;
+          for (var j = i + 1; j < mapDiv.length; j++) {
+            //隣りあう２つの値を比べて、後ろが小さければ交換する
+            if (
+              mapDiv[tmpIndex].querySelector(`input[name='${sortKey}']`).value <
+              mapDiv[j].querySelector(`input[name='${sortKey}']`).value
+            ) {
+              tmpIndex = j;
+            }
+          }
+          document
+            .getElementById("map-grid")
+            .insertBefore(
+              document.getElementsByName("map-div")[tmpIndex],
+              document.getElementsByName("map-div")[i]
+            );
+        }
+      };
+      const sortElementsReverse = (sortKey) => {
+        for (var i = 0; i < mapDiv.length; i++) {
+          //後ろから前に向かって小さい値を浮かび上がらせるfor文
+          let tmpIndex = i;
+          for (var j = i + 1; j < mapDiv.length; j++) {
+            //隣りあう２つの値を比べて、後ろが小さければ交換する
+            if (
+              mapDiv[tmpIndex].querySelector(`input[name='${sortKey}']`).value >
+              mapDiv[j].querySelector(`input[name='${sortKey}']`).value
+            ) {
+              tmpIndex = j;
+            }
+          }
+          document
+            .getElementById("map-grid")
+            .insertBefore(
+              document.getElementsByName("map-div")[tmpIndex],
+              document.getElementsByName("map-div")[i]
+            );
+        }
+      };
+
+      // filterFunc
+      document
+        .getElementById("success_select_filter")
+        .addEventListener("change", function (event) {
+          if (event.target.value === "0") {
+            removeFilterElements();
+          } else if (event.target.value === "1") {
+            removeFilterElements();
+            filterElements("sort-key-game-genre", "APEX LEGENDS");
+          } else if (event.target.value === "2") {
+            removeFilterElements();
+            filterElements("sort-key-game-genre", "VALORANT");
+          } else if (event.target.value === "3") {
+            removeFilterElements();
+            filterElements("sort-key-game-genre", "OVERWATCH2");
+          } else if (event.target.value === "4") {
+            removeFilterElements();
+            filterElements("sort-key-game-genre", "Splatoon3");
+          } else if (event.target.value === "5") {
+            removeFilterElements();
+            filterElements("sort-key-game-genre", "スマブラSP");
+          } else if (event.target.value === "6") {
+            removeFilterElements();
+            filterElements("sort-key-game-genre", "LOL");
+          } else if (event.target.value === "7") {
+            removeFilterElements();
+            filterElements("sort-key-game-genre", "その他");
+          }
+        });
+
+      const filterElements = (filterKey, filterValue) => {
+        removeFilterElements();
+        for (var i = 0; i < mapDiv.length; i++) {
+          if (
+            mapDiv[i].querySelector(`input[name='${filterKey}']`).value !==
+            filterValue
+          ) {
+            mapDiv[i].classList.add("hidden");
+          }
+        }
+      };
+
+      const removeFilterElements = () => {
+        for (var i = 0; i < mapDiv.length; i++) {
+          mapDiv[i].classList.remove("hidden");
+        }
+      };
+
+      // プラットフォームのチェックボックスが選択されるたびに配列に格納する関数
+      function getCheckedValues() {
+        const checkboxes = document.querySelectorAll(".nes-checkbox");
+        checkedValues = [];
+
+        checkboxes.forEach((checkbox) => {
+          if (checkbox.checked) {
+            checkedValues.push(checkbox.value);
+          }
+        });
+      }
     </script>
+
+    <script type="module">
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js";
+      import {
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
+      import "https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js";
+      import "https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js";
+
+      // ログイン状態の変更を監視
+      const authStatusElement = document.getElementById("auth-status");
+
+      // firebaseからuserdataを取得
+      async function getUserData(user) {
+        if (user) {
+          const uid = user.uid;
+          const { db } = await import("./firebase-init.js");
+          const userDocRef = doc(db, "users", uid);
+
+          try {
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+              console.log("User data:", userDoc.data().favoriteGame);
+            } else {
+              console.log("No user data found");
+            }
+          } catch (error) {
+            console.error("Error getting user data:", error);
+          }
+        } else {
+          console.log("Not logged in");
+        }
+      }
+
+      // ログイン状態の有無で動作変更
+      async function checkAuthStatus() {
+        const { auth } = await import("./firebase-init.js");
+
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            getUserData(user);
+          } else {
+          }
+        });
+      }
+
+      checkAuthStatus();
+    </script>
+    <script type="module" src="firebase-init.js"></script>
+    <script type="module" src="authentication.js"></script>
   </body>
 </html>

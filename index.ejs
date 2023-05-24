@@ -19,7 +19,7 @@
     <script src="/dist/rpgui.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <title>Phaser Template</title>
+    <title>Sora Rooms</title>
     <style>
       html,
       body,
@@ -60,7 +60,7 @@
     <span id="idName"></span>
     <div class="rpgui-content">
       <div class="rpgui-container framed relative h-full">
-        <div class="flex flex-row pt-4">
+        <div class="flex flex-row pt-2">
           <div class="relative" id="game-container">
             <div class="absolute top-0 right-0 w-1/6">
               <video
@@ -71,6 +71,70 @@
               <div class="remote-streams" id="js-remote-streams"></div>
             </div>
           </div>
+          <!-- プロフィールモーダル -->
+          <section>
+            <dialog
+              class="nes-dialog is-dark is-rounded w-[620px]"
+              id="dialog-dark-rounded"
+            >
+              <form method="dialog">
+                <h2 class="title text-center pb-7">User Profile</h2>
+                <div class="flex flex-col items-start px-10 space-y-7 py-7">
+                  <div class="w-full flex flex-row justify-between space-x-10">
+                    <p class="">User Name</p>
+                    <p id="userNamePlace" class=""></p>
+                  </div>
+                  <div class="w-full flex flex-row justify-between space-x-10">
+                    <p class="">Favorite Games</p>
+                    <p id="favoriteGamePlace" class=""></p>
+                  </div>
+
+                  <div
+                    class="w-full flex flex-row justify-between items-center"
+                  >
+                    <div>
+                      <p class="">Use Platform</p>
+                    </div>
+                    <div class="flex flex-row justify-evenly space-x-4">
+                      <img
+                        class="hidden"
+                        src="./assets/gameLogo/pc-logo.png"
+                        width="40"
+                        alt=""
+                        id="pc"
+                      /><img
+                        class="hidden"
+                        src="./assets/gameLogo/playstation-icon.webp"
+                        width="40"
+                        alt=""
+                        id="playstation"
+                      /><img
+                        class="hidden"
+                        class="hidden"
+                        src="./assets/gameLogo/switch-logo.png"
+                        width="40"
+                        alt=""
+                        id="switch"
+                      /><img
+                        class="hidden"
+                        src="./assets/gameLogo/xbox-logo.png"
+                        width="40"
+                        alt=""
+                        id="xbox"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <menu
+                  class="dialog-menu pt-5 space-x-3 dialog-menu flex items-end justify-end"
+                >
+                  <button class="nes-btn">Cancel</button>
+                  <button class="nes-btn is-primary">Friend Request</button>
+                </menu>
+              </form>
+            </dialog>
+          </section>
+          <!--  -->
           <div class="nes-container bg-white is-dark w-full p-0 flex flex-col">
             <div class="flex flex-row">
               <a class="nes-btn w-1/4" id="chat">
@@ -88,7 +152,7 @@
               ><a class="nes-btn w-1/4" id="shareScreen">
                 <i class="fa-solid fa-desktop fa-2x"></i
               ></a>
-              <div id="shakeHandImg" class="">
+              <div id="shakeHandImg" class="hidden">
                 <img width="30" src="./assets/shakehand.png" />
               </div>
             </div>
@@ -100,13 +164,48 @@
             >
             <!-- chatのdiv -->
             <div class="flex flex-col justify-between w-full h-full">
-              <div class="p-4">
-                <div class="flex w-full">
-                  <ul
-                    class="space-y-4 text-gray-100 h-[518px] overflow-y-auto"
-                    id="messageList"
-                    style="font-family: 'DotGothic16', sans-serif"
-                  ></ul>
+              <div class="flex flex-col justify-between">
+                <div class="p-4">
+                  <div class="flex w-full">
+                    <ul
+                      class="space-y-4 text-gray-100 h-[518px] w-full overflow-y-auto"
+                      id="messageList"
+                      style="font-family: 'DotGothic16', sans-serif"
+                    ></ul>
+                  </div>
+                </div>
+
+                <div class="flex flex-row">
+                  <a
+                    id="smile-emote"
+                    class="nes-btn is-success w-1/5 text-center"
+                    style="font-size: 24px"
+                    >😀</a
+                  >
+                  <a
+                    id="angry-emote"
+                    class="nes-btn is-success w-1/5"
+                    style="font-size: 24px"
+                    >😂</a
+                  >
+                  <a
+                    id="hand-emote"
+                    class="nes-btn is-success w-1/5"
+                    style="font-size: 24px"
+                    >👋</a
+                  >
+                  <a
+                    id="heart-emote"
+                    class="nes-btn is-success w-1/5"
+                    style="font-size: 24px"
+                    >❤️</a
+                  >
+                  <a
+                    id="good-emote"
+                    class="nes-btn is-success w-1/5"
+                    style="font-size: 24px"
+                    >👍</a
+                  >
                 </div>
               </div>
               <div class="flex flex-row" id="sendChatForm">
@@ -143,6 +242,13 @@
       const jslocalstream = document.getElementById("js-local-stream");
       const jsjointrigger = document.getElementById("js-join-trigger");
       const jsleavetrigger = document.getElementById("js-leave-trigger");
+      const smileEmote = document.getElementById("smile-emote");
+      const handEmote = document.getElementById("hand-emote");
+      const angryEmote = document.getElementById("angry-emote");
+      const heartEmote = document.getElementById("heart-emote");
+      const goodEmote = document.getElementById("good-emote");
+      const inputText = document.getElementById("inputText");
+
       if (config.canUseTextChat == "no") {
         chat.setAttribute("class", "hidden");
         sendChatForm.setAttribute("class", "hidden");
@@ -161,8 +267,25 @@
       if (config.canUseVoiceChat == "no" && config.canUseEmote == "no") {
         jsjointrigger.setAttribute("class", "hidden");
       }
+
+      smileEmote.addEventListener("click", () => {
+        inputText.value = "emote:😀";
+      });
+      handEmote.addEventListener("click", () => {
+        inputText.value = "emote:👋";
+      });
+      angryEmote.addEventListener("click", () => {
+        inputText.value = "emote:😂";
+      });
+      heartEmote.addEventListener("click", () => {
+        inputText.value = "emote:❤️";
+      });
+      goodEmote.addEventListener("click", () => {
+        inputText.value = "emote:👍";
+      });
     </script>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script type="module" src="firebase-init.js"></script>
     <script src="./index.js" type="module"></script>
     <script src="//cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
     <script src="./script.js"></script>

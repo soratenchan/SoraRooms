@@ -2,5 +2,6 @@
   "canDisplayPlayerName": "yes",
   "canUseEmote": "yes",
   "canUseTextChat": "yes",
-  "canUseVoiceChat": "yes"
+  "canUseVoiceChat": "yes",
+  "gameGenre": "その他"
 }

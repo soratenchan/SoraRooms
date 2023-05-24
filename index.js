@@ -34,6 +34,14 @@ let playerName = localStorage.getItem("playerName");
 let anotherPlayerNameList = {};
 let isEmoteFlag = false;
 let avatar = localStorage.getItem("avatar");
+let favoriteGame;
+let usePlatform;
+let avatarListObj = {
+  atlas: { rootName: "atlas", subName: "misa" },
+  "atlas-purple": { rootName: "atlas-purple", subName: "misa-purple" },
+  "atlas-blue": { rootName: "atlas-blue", subName: "misa-blue" },
+  "atlas-green": { rootName: "atlas-green", subName: "misa-green" },
+};
 
 function preload() {
   // 自分で作ったやつ
@@ -45,11 +53,16 @@ function preload() {
   // this.load.tilemapTiledJSON("map", "/assets/tilemaps/tuxemon-town.json");
 
   this.load.tilemapTiledJSON("map", `/user-map/${mapName}/tileMap.json`);
-  this.load.atlas(
-    "atlas",
-    "/assets/atlas/atlas.png",
-    "/assets/atlas/atlas.json"
-  );
+
+  for (const avatarKey in avatarListObj) {
+    const avatar = avatarListObj[avatarKey];
+    this.load.atlas(
+      avatar.rootName,
+      `/assets/${avatar.rootName}/${avatar.rootName}.png`,
+      `/assets/${avatar.rootName}/${avatar.rootName}.json`
+    );
+  }
+
   this.load.spritesheet("dude", "assets/dude.png", {
     frameWidth: 32,
     frameHeight: 48,
@@ -89,79 +102,83 @@ function create() {
   phaserPlayerList[playerId] = createPlayer(
     this.physics.add,
     worldLayer,
-    spawnPoint
+    spawnPoint,
+    avatarListObj[avatar]
   );
+  // phaserPlayerList[playerId].currentTextChat = "hoge";
 
   const anims = this.anims;
-  // dudeのアニメーション作成
-  anims.create({
-    key: "dude-left",
-    frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
-    frameRate: 10,
-    repeat: -1,
-  });
-  anims.create({
-    key: "dude-front",
-    frames: [{ key: "dude", frame: 4 }],
-    frameRate: 20,
-  });
-  anims.create({
-    key: "dude-back",
-    frames: [{ key: "dude", frame: 4 }],
-    frameRate: 20,
-  });
-  anims.create({
-    key: "dude-right",
-    frames: this.anims.generateFrameNumbers("dude", { start: 5, end: 8 }),
-    frameRate: 10,
-    repeat: -1,
-  });
+  // // dudeのアニメーション作成
+  // anims.create({
+  //   key: "dude-left",
+  //   frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
+  //   frameRate: 10,
+  //   repeat: -1,
+  // });
+  // anims.create({
+  //   key: "dude-front",
+  //   frames: [{ key: "dude", frame: 4 }],
+  //   frameRate: 20,
+  // });
+  // anims.create({
+  //   key: "dude-back",
+  //   frames: [{ key: "dude", frame: 4 }],
+  //   frameRate: 20,
+  // });
+  // anims.create({
+  //   key: "dude-right",
+  //   frames: this.anims.generateFrameNumbers("dude", { start: 5, end: 8 }),
+  //   frameRate: 10,
+  //   repeat: -1,
+  // });
   // misaのアニメーション作成
-  anims.create({
-    key: "misa-left",
-    frames: anims.generateFrameNames("atlas", {
-      prefix: "misa-left-walk.",
-      start: 0,
-      end: 3,
-      zeroPad: 3,
-    }),
-    frameRate: 10,
-    repeat: -1,
-  });
-  anims.create({
-    key: "misa-right",
-    frames: anims.generateFrameNames("atlas", {
-      prefix: "misa-right-walk.",
-      start: 0,
-      end: 3,
-      zeroPad: 3,
-    }),
-    frameRate: 10,
-    repeat: -1,
-  });
-  anims.create({
-    key: "misa-front",
-    frames: anims.generateFrameNames("atlas", {
-      prefix: "misa-front-walk.",
-      start: 0,
-      end: 3,
-      zeroPad: 3,
-    }),
-    frameRate: 10,
-    repeat: -1,
-  });
-  anims.create({
-    key: "misa-back",
-    frames: anims.generateFrameNames("atlas", {
-      prefix: "misa-back-walk.",
-      start: 0,
-      end: 3,
-      zeroPad: 3,
-    }),
-    frameRate: 10,
-    repeat: -1,
-  });
-
+  for (const avatarKey in avatarListObj) {
+    const avatar = avatarListObj[avatarKey];
+    anims.create({
+      key: `${avatar.subName}-left`,
+      frames: anims.generateFrameNames(avatar.rootName, {
+        prefix: `${avatar.subName}-left-walk.`,
+        start: 0,
+        end: 3,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    anims.create({
+      key: `${avatar.subName}-right`,
+      frames: anims.generateFrameNames(avatar.rootName, {
+        prefix: `${avatar.subName}-right-walk.`,
+        start: 0,
+        end: 3,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    anims.create({
+      key: `${avatar.subName}-front`,
+      frames: anims.generateFrameNames(avatar.rootName, {
+        prefix: `${avatar.subName}-front-walk.`,
+        start: 0,
+        end: 3,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    anims.create({
+      key: `${avatar.subName}-back`,
+      frames: anims.generateFrameNames(avatar.rootName, {
+        prefix: `${avatar.subName}-back-walk.`,
+        start: 0,
+        end: 3,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+  }
   const camera = this.cameras.main;
   camera.startFollow(phaserPlayerList[playerId]);
   camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -183,7 +200,7 @@ function create() {
   });
 
   // プレイヤーに追従するimageを設定
-  follower = this.add
+  phaserPlayerList[playerId].follower = this.add
     .follower(phaserPlayerList[playerId], 0, 0, "shakeHand")
     .setVisible(false);
 
@@ -197,6 +214,18 @@ function create() {
     // プレイヤー名を中央寄せする
     playerName.setOrigin(0.5, 0.5);
   }
+
+  phaserPlayerList[playerId].setInteractive();
+
+  // 自プレイヤーをクリックした時に発火
+  phaserPlayerList[playerId].on("pointerdown", () => {
+    console.log("Sprite clicked!");
+
+    // クリック時のアクションをここに記述
+    // 例: スプライトの位置を変更
+    // mySprite.x = Phaser.Math.Between(0, this.sys.canvas.width);
+    // mySprite.y = Phaser.Math.Between(0, this.sys.canvas.height);
+  });
 }
 
 function update(time, delta) {
@@ -209,17 +238,55 @@ function update(time, delta) {
   }
   // 他のプレイヤーの生成処理;
   for (const webSocketPlayerId in webSocketPlayerList) {
+    // 既に生成されたプレイヤーは生成しないように
     if (!phaserPlayerList.hasOwnProperty(webSocketPlayerId)) {
+      // 同じマップ内のプレイヤーのみ生成するように
       if (mapName == webSocketPlayerList[webSocketPlayerId].mapName) {
+        console.log(
+          avatarListObj[webSocketPlayerList[webSocketPlayerId].avatar]
+        );
         phaserPlayerList[webSocketPlayerId] = createPlayer(
           this.physics.add,
           worldLayer,
-          spawnPoint
+          spawnPoint,
+          avatarListObj[webSocketPlayerList[webSocketPlayerId].avatar]
         );
         this.physics.add.collider(
           phaserPlayerList[playerId],
           phaserPlayerList[webSocketPlayerId]
         );
+        phaserPlayerList[webSocketPlayerId].follower = this.add
+          .follower(phaserPlayerList[webSocketPlayerId], 0, 0, "shakeHand")
+          .setVisible(false);
+        // 他プレイヤーがクリックされた時にイベント発火
+        // TODO:userIDをプロフィール作成時に設定して、それをもとにクリックした時にプロフィール表示
+        phaserPlayerList[webSocketPlayerId].setInteractive();
+        // クリックイベントのリスニングを設定
+        phaserPlayerList[webSocketPlayerId].on("pointerdown", () => {
+          const profileModal = document.getElementById("dialog-dark-rounded");
+          const favoriteGamePlace =
+            document.getElementById("favoriteGamePlace");
+          const userNamePlace = document.getElementById("userNamePlace");
+          favoriteGamePlace.innerText =
+            webSocketPlayerList[webSocketPlayerId].favoriteGame;
+          userNamePlace.innerText =
+            webSocketPlayerList[webSocketPlayerId].playerName;
+          if (webSocketPlayerList[webSocketPlayerId].usePlatform) {
+            for (const platform of webSocketPlayerList[webSocketPlayerId]
+              .usePlatform) {
+              document.getElementById(platform).setAttribute("class", "flex");
+            }
+          }
+          profileModal.showModal();
+
+          console.log(webSocketPlayerList[webSocketPlayerId].favoriteGame);
+        });
+        phaserPlayerList[webSocketPlayerId].on("pointerover", () => {
+          console.log("hover");
+        });
+        phaserPlayerList[webSocketPlayerId].on("pointerout", () => {
+          console.log("hover out");
+        });
       }
     }
   }
@@ -248,12 +315,39 @@ function update(time, delta) {
   // setPlayerDirection(player.body, "neutral");
   setPlayerIsMove(phaserPlayerList[playerId].body, false);
 
+  // textchat吹き出しの情報更新
+  for (const phaserPlayerId in phaserPlayerList) {
+    if (phaserPlayerList[phaserPlayerId].currentTextChat) {
+      if (phaserPlayerList[phaserPlayerId].textChatBalloon) {
+        phaserPlayerList[phaserPlayerId].textChatBalloon.destroy();
+        delete phaserPlayerList[phaserPlayerId].textChatBalloon;
+      }
+      phaserPlayerList[phaserPlayerId].textChatBalloon = createTextChat(
+        this.add,
+        phaserPlayerList[phaserPlayerId],
+        phaserPlayerList[phaserPlayerId].currentTextChat
+      );
+      phaserPlayerList[phaserPlayerId].textChatBalloon.setOrigin(0.5, 0.5);
+      setTimeout(() => {
+        phaserPlayerList[phaserPlayerId].textChatBalloon.destroy();
+        delete phaserPlayerList[phaserPlayerId].textChatBalloon;
+      }, "5000");
+      delete phaserPlayerList[phaserPlayerId].currentTextChat;
+    } else {
+      if (phaserPlayerList[phaserPlayerId].textChatBalloon) {
+        phaserPlayerList[phaserPlayerId].textChatBalloon.setPosition(
+          phaserPlayerList[phaserPlayerId].x,
+          phaserPlayerList[phaserPlayerId].y - 40
+        );
+      }
+    }
+  }
+
   // 他プレイヤーの情報更新
   for (const webSocketPlayerId in webSocketPlayerList) {
     if (webSocketPlayerId != playerId) {
       if (mapName == webSocketPlayerList[webSocketPlayerId].mapName) {
         //初回に各playerNameを作成・listに追加、その後は作成したplayerNameの位置を調整
-
         if (!anotherPlayerNameList[webSocketPlayerId]) {
           if (configForIndex.canDisplayPlayerName == "yes") {
             anotherPlayerNameList[webSocketPlayerId] = createPlayerName(
@@ -266,6 +360,7 @@ function update(time, delta) {
         } else {
           // console.log(webSocketPlayerId);
           // console.log(anotherPlayerNameList);
+
           if (configForIndex.canDisplayPlayerName == "yes") {
             anotherPlayerNameList[webSocketPlayerId].setPosition(
               webSocketPlayerList[webSocketPlayerId].x,
@@ -280,7 +375,10 @@ function update(time, delta) {
           webSocketPlayerList[webSocketPlayerId].y;
         if (webSocketPlayerList[webSocketPlayerId].isMove) {
           phaserPlayerList[webSocketPlayerId].anims.play(
-            `misa-${webSocketPlayerList[webSocketPlayerId].direction}`,
+            `${
+              avatarListObj[webSocketPlayerList[webSocketPlayerId].avatar]
+                .subName
+            }-${webSocketPlayerList[webSocketPlayerId].direction}`,
             true
           );
         } else {
@@ -318,7 +416,7 @@ function update(time, delta) {
   // プレイヤーが動いているか否かでアニメーション表示変える
   if (phaserPlayerList[playerId].body.isMove) {
     phaserPlayerList[playerId].anims.play(
-      `${avatar}-${phaserPlayerList[playerId].body.direction}`,
+      `${avatarListObj[avatar].subName}-${phaserPlayerList[playerId].body.direction}`,
       true
     );
   } else {
@@ -326,38 +424,41 @@ function update(time, delta) {
 
     // If we were moving, pick and idle frame to use
     if (prevVelocity.x < 0)
-      avatar === "misa"
-        ? phaserPlayerList[playerId].setTexture("atlas", "misa-left")
-        : phaserPlayerList[playerId].anims.play("dude-front");
+      phaserPlayerList[playerId].setTexture(
+        avatarListObj[avatar].rootName,
+        `${avatarListObj[avatar].subName}-left`
+      );
     else if (prevVelocity.x > 0)
-      phaserPlayerList[playerId].setTexture("atlas", "misa-right");
+      phaserPlayerList[playerId].setTexture(
+        avatarListObj[avatar].rootName,
+        `${avatarListObj[avatar].subName}-right`
+      );
     else if (prevVelocity.y < 0)
-      phaserPlayerList[playerId].setTexture("atlas", "misa-back");
+      phaserPlayerList[playerId].setTexture(
+        avatarListObj[avatar].rootName,
+        `${avatarListObj[avatar].subName}-back`
+      );
     else if (prevVelocity.y > 0)
-      phaserPlayerList[playerId].setTexture("atlas", "misa-front");
+      phaserPlayerList[playerId].setTexture(
+        avatarListObj[avatar].rootName,
+        `${avatarListObj[avatar].subName}-front`
+      );
   }
 
   //isEmoteFlagで追従しているエモート画像のon/off
-  follower.setScale(0.08);
-  if (isEmoteFlag) {
-    follower
-      .setPosition(
-        phaserPlayerList[playerId].x,
-        phaserPlayerList[playerId].y - 40
-      )
-      .setVisible(true);
-  } else {
-    follower.setVisible(false);
+  for (const playerId in phaserPlayerList) {
+    const player = phaserPlayerList[playerId];
+    player.follower.setScale(0.08);
+    if (player.isEmote) {
+      player.follower.setPosition(player.x, player.y - 40).setVisible(true);
+      // ボタンをクリックしたらプレイヤーに追従している画像を１秒間表示
+      setTimeout(() => {
+        player.isEmote = false;
+      }, "1000");
+    } else {
+      player.follower.setVisible(false);
+    }
   }
-  // ボタンをクリックしたらプレイヤーに追従している画像を１秒間表示
-  const domElement = document.getElementById("shakeHandImg");
-  domElement.addEventListener("click", () => {
-    isEmoteFlag = true;
-    setTimeout(() => {
-      isEmoteFlag = false;
-    }, "1000");
-  });
-
   // socket送信
   sendPlayerInfo(phaserPlayerList[playerId].body);
 }
@@ -372,6 +473,9 @@ const sendPlayerInfo = (playerBody) => {
     id: playerId,
     playerName: localStorage.getItem("playerName"),
     mapName: mapName,
+    favoriteGame: favoriteGame,
+    usePlatform: usePlatform,
+    avatar: avatar,
   };
   socket.emit("sendPlayerInfo", playerState);
 };
@@ -386,9 +490,15 @@ const setPlayerIsMove = (playerBody, isMove) => {
   playerBody.isMove = isMove;
 };
 
-const createPlayer = (physicsAdd, worldLayer, spawnPoint) => {
+const createPlayer = (physicsAdd, worldLayer, spawnPoint, avatarInfo) => {
+  console.log(avatarListObj[avatar].rootName);
   const player = physicsAdd
-    .sprite(spawnPoint.x, spawnPoint.y, "atlas", "misa-front")
+    .sprite(
+      spawnPoint.x,
+      spawnPoint.y,
+      avatarInfo.rootName,
+      `${avatarInfo.subName}-front`
+    )
     .setSize(30, 40)
     .setOffset(0, 24);
 
@@ -397,11 +507,13 @@ const createPlayer = (physicsAdd, worldLayer, spawnPoint) => {
   return player;
 };
 
-const playEmote = (follower, player, time, isEmote) => {
+const playEmote = (targetPlayerId, player, time, isEmote) => {
   // 画像を表示する
   // follower.setScale(0.08);
   // follower.setPosition(player.x, player.y - 45).setVisible(true);
   // 1秒後に画像を非表示にする
+  const follower = phaserPlayerList[targetPlayerId];
+
   time.addEvent({
     delay: 1000,
     callback: () => {
@@ -422,9 +534,30 @@ const createPlayerName = (element, player, name) => {
   return playerName;
 };
 
+const createTextChat = (element, player, chat) => {
+  const regex = /emote:/;
+  if (regex.test(chat)) {
+    const newChat = chat.replace(regex, "");
+    let textChat = element.text(player.x, player.y - 60, newChat, {
+      font: "34px",
+      fill: "black",
+      align: "center",
+    });
+    return textChat;
+  } else {
+    let textChat = element.text(player.x, player.y - 40, "＼" + chat + "／", {
+      font: "18px",
+      fill: "black",
+      align: "center",
+    });
+    return textChat;
+  }
+};
+
 // socketで送られてきたチャットメッセージを追加
 const addMessageList = (message) => {
-  const chat = document.getElementById("chat");
+  // phaserPlayerList[message.playerId].isEmote = true;
+  phaserPlayerList[message.playerId].currentTextChat = message.message;
   const ul = document.getElementById("messageList");
   const li = document.createElement("p");
   li.classList.add("useMyFont");
@@ -457,6 +590,7 @@ document.getElementById("sendButton").addEventListener("click", () => {
     message: inputMessage,
     mapName: mapName,
     playerName: playerName,
+    playerId: playerId,
   });
   document.getElementById("inputText").value = "";
 });
@@ -476,6 +610,7 @@ function keypress_event(e) {
       message: inputMessage,
       mapName: mapName,
       playerName: playerName,
+      playerId: playerId,
     });
     document.getElementById("inputText").value = "";
   }
@@ -522,3 +657,50 @@ socket.on("receiveMessage", (message) => {
   // 受信したメッセージをulタグに挿入
   addMessageList(message);
 });
+
+// firebaseから登録済みユーザーのプロフィールを取得
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js";
+import {
+  doc,
+  getDoc,
+} from "https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
+import "https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js";
+import "https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js";
+
+// firebaseからuserdataを取得
+async function getUserData(user) {
+  if (user) {
+    const uid = user.uid;
+    const { db } = await import("./firebase-init.js");
+    const userDocRef = doc(db, "users", uid);
+
+    try {
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        favoriteGame = userDoc.data().favoriteGame;
+        usePlatform = userDoc.data().platform;
+      } else {
+        console.log("No user data found");
+      }
+    } catch (error) {
+      console.error("Error getting user data:", error);
+    }
+  } else {
+    console.log("Not logged in");
+  }
+}
+
+// ログイン状態の有無で動作変更
+async function checkAuthStatus() {
+  const { auth } = await import("./firebase-init.js");
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      getUserData(user);
+    } else {
+    }
+  });
+}
+
+checkAuthStatus();
