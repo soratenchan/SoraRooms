@@ -1,1 +1,5 @@
 node_modules/
+tempMap/
+user-map/
+thumbnails/
+.DS_Store

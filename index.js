@@ -4,6 +4,9 @@ const config = {
   width: "100%",
   height: "100%",
   parent: "game-container",
+  scale: {
+    mode: Phaser.Scale.RESIZE,
+  },
   pixelArt: true,
   physics: {
     default: "arcade",

@@ -29,8 +29,8 @@
       }
 
       #game-container {
-        min-width: 76vw;
-        min-height: 90vh;
+        /* min-width: 76vw;
+        min-height: 90vh; */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -59,9 +59,73 @@
   <body style="font-family: 'DotGothic16', sans-serif">
     <span id="idName"></span>
     <div class="rpgui-content">
-      <div class="rpgui-container framed relative h-full">
-        <div class="flex flex-row pt-2">
-          <div class="relative" id="game-container">
+      <div
+        class="rpgui-container framed relative h-full min-w-[1000px] min-h-[723px]"
+      >
+        <!-- プロフィールモーダル -->
+        <section>
+          <dialog
+            class="nes-dialog is-dark is-rounded w-[620px]"
+            id="dialog-dark-rounded"
+          >
+            <form method="dialog">
+              <h2 class="title text-center pb-7">User Profile</h2>
+              <div class="flex flex-col items-start px-10 space-y-7 py-7">
+                <div class="w-full flex flex-row justify-between space-x-10">
+                  <p class="">User Name</p>
+                  <p id="userNamePlace" class=""></p>
+                </div>
+                <div class="w-full flex flex-row justify-between space-x-10">
+                  <p class="">Favorite Games</p>
+                  <p id="favoriteGamePlace" class=""></p>
+                </div>
+
+                <div class="w-full flex flex-row justify-between items-center">
+                  <div>
+                    <p class="">Use Platform</p>
+                  </div>
+                  <div class="flex flex-row justify-evenly space-x-4">
+                    <img
+                      class="hidden"
+                      src="./assets/gameLogo/pc-logo.png"
+                      width="40"
+                      alt=""
+                      id="pc"
+                    /><img
+                      class="hidden"
+                      src="./assets/gameLogo/playstation-icon.webp"
+                      width="40"
+                      alt=""
+                      id="playstation"
+                    /><img
+                      class="hidden"
+                      class="hidden"
+                      src="./assets/gameLogo/switch-logo.png"
+                      width="40"
+                      alt=""
+                      id="switch"
+                    /><img
+                      class="hidden"
+                      src="./assets/gameLogo/xbox-logo.png"
+                      width="40"
+                      alt=""
+                      id="xbox"
+                    />
+                  </div>
+                </div>
+              </div>
+              <menu
+                class="dialog-menu pt-5 space-x-3 dialog-menu flex items-end justify-end"
+              >
+                <button class="nes-btn">Cancel</button>
+                <button class="nes-btn is-primary">Friend Request</button>
+              </menu>
+            </form>
+          </dialog>
+        </section>
+        <!--  -->
+        <div class="flex flex-row pt-2 h-full">
+          <div class="relative flex-auto w-96" id="game-container">
             <div class="absolute top-0 right-0 w-1/6">
               <video
                 class="hidden"
@@ -71,71 +135,9 @@
               <div class="remote-streams" id="js-remote-streams"></div>
             </div>
           </div>
-          <!-- プロフィールモーダル -->
-          <section>
-            <dialog
-              class="nes-dialog is-dark is-rounded w-[620px]"
-              id="dialog-dark-rounded"
-            >
-              <form method="dialog">
-                <h2 class="title text-center pb-7">User Profile</h2>
-                <div class="flex flex-col items-start px-10 space-y-7 py-7">
-                  <div class="w-full flex flex-row justify-between space-x-10">
-                    <p class="">User Name</p>
-                    <p id="userNamePlace" class=""></p>
-                  </div>
-                  <div class="w-full flex flex-row justify-between space-x-10">
-                    <p class="">Favorite Games</p>
-                    <p id="favoriteGamePlace" class=""></p>
-                  </div>
-
-                  <div
-                    class="w-full flex flex-row justify-between items-center"
-                  >
-                    <div>
-                      <p class="">Use Platform</p>
-                    </div>
-                    <div class="flex flex-row justify-evenly space-x-4">
-                      <img
-                        class="hidden"
-                        src="./assets/gameLogo/pc-logo.png"
-                        width="40"
-                        alt=""
-                        id="pc"
-                      /><img
-                        class="hidden"
-                        src="./assets/gameLogo/playstation-icon.webp"
-                        width="40"
-                        alt=""
-                        id="playstation"
-                      /><img
-                        class="hidden"
-                        class="hidden"
-                        src="./assets/gameLogo/switch-logo.png"
-                        width="40"
-                        alt=""
-                        id="switch"
-                      /><img
-                        class="hidden"
-                        src="./assets/gameLogo/xbox-logo.png"
-                        width="40"
-                        alt=""
-                        id="xbox"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <menu
-                  class="dialog-menu pt-5 space-x-3 dialog-menu flex items-end justify-end"
-                >
-                  <button class="nes-btn">Cancel</button>
-                  <button class="nes-btn is-primary">Friend Request</button>
-                </menu>
-              </form>
-            </dialog>
-          </section>
-          <!--  -->
-          <div class="nes-container bg-white is-dark w-full p-0 flex flex-col">
+          <div
+            class="flex-none nes-container bg-white is-dark w-82 p-0 flex flex-col"
+          >
             <div class="flex flex-row">
               <a class="nes-btn w-1/4" id="chat">
                 <i class="fa-solid fa-comments fa-2x"></i></a
@@ -168,13 +170,14 @@
                 <div class="p-4">
                   <div class="flex w-full">
                     <ul
-                      class="space-y-4 text-gray-100 h-[518px] w-full overflow-y-auto"
+                      class="space-y-4 text-gray-100 h-[400px] w-full overflow-y-auto"
                       id="messageList"
                       style="font-family: 'DotGothic16', sans-serif"
                     ></ul>
                   </div>
                 </div>
-
+              </div>
+              <div class="flex flex-col" id="sendChatForm">
                 <div class="flex flex-row">
                   <a
                     id="smile-emote"
@@ -207,21 +210,21 @@
                     >👍</a
                   >
                 </div>
-              </div>
-              <div class="flex flex-row" id="sendChatForm">
-                <div class="bg-gray-400 p-2 flex-grow">
-                  <input
-                    class="bg-white flex items-center h-12 w-full rounded px-3 text-sm useMyFont inputUseMyFont"
-                    id="inputText"
-                    type="text"
-                    placeholder="コメントを入力…"
-                  />
-                </div>
-                <div
-                  class="p-0 w-16 flex items-center justify-center bg-gray-300"
-                  id="sendButton"
-                >
-                  <i class="fa-2x fa-solid fa-paper-plane text-white"></i>
+                <div class="flex flex-row">
+                  <div class="bg-gray-400 p-2 flex-grow">
+                    <input
+                      class="bg-white flex items-center h-12 w-full rounded px-3 text-sm useMyFont inputUseMyFont"
+                      id="inputText"
+                      type="text"
+                      placeholder="コメントを入力…"
+                    />
+                  </div>
+                  <div
+                    class="p-0 w-16 flex items-center justify-center bg-gray-300"
+                    id="sendButton"
+                  >
+                    <i class="fa-2x fa-solid fa-paper-plane text-white"></i>
+                  </div>
                 </div>
               </div>
             </div>
