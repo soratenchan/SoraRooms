@@ -59,9 +59,7 @@
   <body style="font-family: 'DotGothic16', sans-serif">
     <span id="idName"></span>
     <div class="rpgui-content">
-      <div
-        class="rpgui-container framed relative h-full min-w-[1000px] min-h-[723px]"
-      >
+      <div class="rpgui-container framed relative h-full min-w-[1000px]">
         <!-- プロフィールモーダル -->
         <section>
           <dialog
@@ -136,7 +134,7 @@
             </div>
           </div>
           <div
-            class="flex-none nes-container bg-white is-dark w-82 p-0 flex flex-col"
+            class="flex-none nes-container bg-white is-dark w-82 h-full overflow-hidden p-0 flex flex-col"
           >
             <div class="flex flex-row">
               <a class="nes-btn w-1/4" id="chat">
@@ -165,12 +163,16 @@
               >leave videoroom</a
             >
             <!-- chatのdiv -->
-            <div class="flex flex-col justify-between w-full h-full">
-              <div class="flex flex-col justify-between">
-                <div class="p-4">
-                  <div class="flex w-full">
+            <div
+              class="flex flex-col justify-between w-full h-full overflow-hidden"
+            >
+              <div
+                class="flex flex-col justify-between flex-auto h-full overflow-hidden"
+              >
+                <div class="p-4 overflow-hidden">
+                  <div class="flex w-full h-full overflow-hidden">
                     <ul
-                      class="space-y-4 text-gray-100 h-[400px] w-full overflow-y-auto"
+                      class="space-y-4 text-gray-100 h-full w-full overflow-y-auto"
                       id="messageList"
                       style="font-family: 'DotGothic16', sans-serif"
                     ></ul>
